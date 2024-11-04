@@ -1,13 +1,13 @@
-package com.example.onlybuns;
+package com.example.onlybunsbe;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OnlyBunsApplicationTests {
+class OnlyBunsBeApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
