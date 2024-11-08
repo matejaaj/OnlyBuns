@@ -4,4 +4,5 @@ export interface CommentDTO {
   userId: number;
   content: string;
   createdAt: Date;
+  userName: string;
 }
