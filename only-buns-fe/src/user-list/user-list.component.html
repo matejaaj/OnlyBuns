@@ -1,0 +1,19 @@
+<h1>Registered Users</h1>
+
+<div>
+  <label>Sort by:</label>
+  <button (click)="onSortChange('email')">Email</button>
+  <button (click)="onSortChange('followers')">Followers</button>
+</div>
+
+<ul>
+  <li *ngFor="let user of users">
+    <p><strong>Name:</strong> {{ user.firstName }} {{ user.lastName }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Role:</strong> {{ user.role }}</p>
+    <p><strong>Posts:</strong> {{ user.postCount }}</p>
+    <p><strong>Following:</strong> {{ user.followingCount }}</p>
+    <p><strong>Followers:</strong> {{ user.followerCount }}</p>
+    <hr />
+  </li>
+</ul>

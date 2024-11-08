@@ -1,9 +1,6 @@
 package com.example.onlybunsbe.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -11,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -65,4 +64,20 @@ public class User {
     @Column(name = "role", nullable = false, length = 50)
     private String role;
 
+    // Veza sa postovima korisnika
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
+    // Lista korisnika koje prate ovog korisnika (followeri)
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private Set<User> followers;
+
+    // Lista korisnika koje ovaj korisnik prati (following)
+    @ManyToMany(mappedBy = "followers")
+    private Set<User> following;
 }

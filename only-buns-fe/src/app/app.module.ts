@@ -6,12 +6,14 @@ import { HomeComponent} from '../home/home.component';
 import { AppRoutingModule } from './app-routing.module'; // Modul za rute
 import { AppComponent } from './app.component';
 import { PostComponent} from './post/post.component';// Uvoz komponente za prikaz objave
+import { UserListComponent} from "../user-list/user-list.component";
 
 @NgModule({
   declarations: [
     AppComponent,
     PostComponent, // Sada možete deklarisati PostComponent jer više nije standalone
-    HomeComponent
+    HomeComponent,
+    UserListComponent
   ],
   imports: [
     BrowserModule,
