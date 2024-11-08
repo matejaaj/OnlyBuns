@@ -1,0 +1,16 @@
+<h1>All Posts</h1>
+<div *ngFor="let post of posts">
+  <h2>{{ post.description }}</h2>
+  <img *ngIf="post.imageUrl" [src]="post.imageUrl" alt="Post Image" class="post-image">
+  <p>Created At: {{ post.createdAt | date:'short' }}</p>
+  <p>Likes: {{ post.likeCount }}</p>
+
+  <h3>Comments</h3>
+  <ul>
+    <li *ngFor="let comment of post.comments">
+      <strong>{{ comment.userName }}</strong>: {{ comment.content }} <br />
+      <small>{{ comment.createdAt | date:'short' }}</small>
+    </li>
+  </ul>
+  <hr />
+</div>
