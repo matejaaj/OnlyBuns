@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1731080366633-1" author="Mateja">
+        <createTable tableName="comments">
+            <column defaultValueComputed="nextval('comments_id_seq')" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_comments"/>
+            </column>
+            <column name="post_id" type="INT"/>
+            <column name="user_id" type="INT"/>
+            <column name="content" type="text(2147483647)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731080366633-2" author="Mateja">
+        <createTable tableName="likes">
+            <column defaultValueComputed="nextval('likes_id_seq')" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_likes"/>
+            </column>
+            <column name="post_id" type="INT"/>
+            <column name="user_id" type="INT"/>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="liked_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731080366633-3" author="Mateja">
+        <createTable tableName="messages">
+            <column defaultValueComputed="nextval('messages_id_seq')" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_messages"/>
+            </column>
+            <column name="content" type="text(2147483647)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="sent_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_id" type="INT"/>
+            <column name="recipient_id" type="INT"/>
+            <column defaultValueBoolean="false" name="is_read" type="BOOLEAN"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731080366633-4" author="Mateja">
+        <createTable tableName="notifications">
+            <column defaultValueComputed="nextval('notifications_id_seq')" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_notifications"/>
+            </column>
+            <column name="user_id" type="INT"/>
+            <column name="content" type="text(2147483647)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="sent_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="false" name="is_read" type="BOOLEAN"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731080366633-5" author="Mateja">
+        <createTable tableName="pet_care_locations">
+            <column defaultValueComputed="nextval('pet_care_locations_id_seq')" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_pet_care_locations"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latitude" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="longitude" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text(2147483647)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731080366633-6" author="Mateja">
+        <createTable tableName="posts">
+            <column defaultValueComputed="nextval('posts_id_seq')" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_posts"/>
+            </column>
+            <column name="description" type="text(2147483647)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_url" type="VARCHAR(255)"/>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+            <column name="user_id" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731080366633-7" author="Mateja">
+        <createTable tableName="user_followers">
+            <column name="user_id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user_followers"/>
+            </column>
+            <column name="follower_id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user_followers"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731080366633-8" author="Mateja">
+        <createTable tableName="users">
+            <column defaultValueComputed="nextval('users_id_seq')" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(255)"/>
+            <column defaultValueBoolean="false" name="is_active" type="BOOLEAN"/>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="registered_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1731080366633-9" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="comments" constraintName="FK_COMMENTS_ON_POST"
+                                 onDelete="CASCADE" referencedColumnNames="id" referencedTableName="posts"/>
+    </changeSet>
+    <changeSet id="1731080366633-10" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="comments" constraintName="FK_COMMENTS_ON_USER"
+                                 onDelete="CASCADE" referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1731080366633-11" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="likes" constraintName="FK_LIKES_ON_POST"
+                                 onDelete="CASCADE" referencedColumnNames="id" referencedTableName="posts"/>
+    </changeSet>
+    <changeSet id="1731080366633-12" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="likes" constraintName="FK_LIKES_ON_USER"
+                                 onDelete="CASCADE" referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1731080366633-13" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="recipient_id" baseTableName="messages"
+                                 constraintName="FK_MESSAGES_ON_RECIPIENT" onDelete="CASCADE" referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1731080366633-14" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="sender_id" baseTableName="messages"
+                                 constraintName="FK_MESSAGES_ON_SENDER" onDelete="CASCADE" referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1731080366633-15" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="notifications"
+                                 constraintName="FK_NOTIFICATIONS_ON_USER" onDelete="CASCADE" referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1731080366633-16" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="posts" constraintName="FK_POSTS_ON_USER"
+                                 onDelete="CASCADE" referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1731080366633-17" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="follower_id" baseTableName="user_followers"
+                                 constraintName="FK_USER_FOLLOWERS_ON_FOLLOWER" onDelete="CASCADE"
+                                 referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1731080366633-18" author="Mateja">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_followers"
+                                 constraintName="FK_USER_FOLLOWERS_ON_USER" onDelete="CASCADE"
+                                 referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+
+</databaseChangeLog>

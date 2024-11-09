@@ -18,7 +18,6 @@ import java.time.Instant;
 @Table(name = "users")
 public class User {
     @Id
-    @ColumnDefault("nextval('users_id_seq')")
     @Column(name = "id", nullable = false)
     private Integer id;
 

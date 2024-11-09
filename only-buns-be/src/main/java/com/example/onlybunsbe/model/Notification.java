@@ -16,7 +16,6 @@ import java.time.Instant;
 @Table(name = "notifications")
 public class Notification {
     @Id
-    @ColumnDefault("nextval('notifications_id_seq')")
     @Column(name = "id", nullable = false)
     private Integer id;
 

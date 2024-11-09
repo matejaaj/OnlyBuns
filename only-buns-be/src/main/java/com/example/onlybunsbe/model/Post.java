@@ -19,7 +19,6 @@ import java.util.List;
 @Table(name = "posts")
 public class Post {
     @Id
-    @ColumnDefault("nextval('posts_id_seq')")
     @Column(name = "id", nullable = false)
     private Integer id;
 

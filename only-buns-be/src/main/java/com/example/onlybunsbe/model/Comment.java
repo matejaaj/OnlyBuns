@@ -16,8 +16,6 @@ import java.time.Instant;
 @Table(name = "comments")
 public class Comment {
     @Id
-    @ColumnDefault("nextval('comments_id_seq')")
-    @Column(name = "id", nullable = false)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
