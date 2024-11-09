@@ -52,20 +52,18 @@ public class TokenUtils {
     /**
      * Funkcija za generisanje JWT tokena.
      *
-     * @param username Korisničko ime korisnika kojem se token izdaje
+     * @param email Korisničko ime korisnika kojem se token izdaje
      * @return JWT token
      */
-    public String generateToken(String username) {
+    public String generateToken(String email) {
         return Jwts.builder()
                 .setIssuer(APP_NAME)
-                .setSubject(username)
+                .setSubject(email)  // Koristi email kao subject
                 .setAudience(generateAudience())
                 .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate())
-                .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
-
-
-        // moguce je postavljanje proizvoljnih podataka u telo JWT tokena pozivom funkcije .claim("key", value), npr. .claim("role", user.getRole())
+                .signWith(SIGNATURE_ALGORITHM, SECRET)
+                .compact();
     }
 
     /**
@@ -121,6 +119,19 @@ public class TokenUtils {
         return null;
     }
 
+    public String getEmailFromToken(String token) {
+        String email;
+        try {
+            final Claims claims = this.getAllClaimsFromToken(token);
+            email = claims.getSubject();  // Subject sada predstavlja email
+        } catch (ExpiredJwtException ex) {
+            throw ex;
+        } catch (Exception e) {
+            email = null;
+        }
+        return email;
+    }
+
     /**
      * Funkcija za preuzimanje vlasnika tokena (korisničko ime).
      * @param token JWT token.
@@ -140,6 +151,7 @@ public class TokenUtils {
 
         return username;
     }
+
 
     /**
      * Funkcija za preuzimanje datuma kreiranja tokena.
@@ -235,13 +247,13 @@ public class TokenUtils {
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
         User user = (User) userDetails;
-        final String username = getUsernameFromToken(token);
+        final String email = getEmailFromToken(token);  // Koristi getEmailFromToken
         final Date created = getIssuedAtDateFromToken(token);
 
         // Token je validan kada:
-        return (username != null // korisnicko ime nije null
-                && username.equals(userDetails.getUsername()) // korisnicko ime iz tokena se podudara sa korisnickom imenom koje pise u bazi
-                && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate())); // nakon kreiranja tokena korisnik nije menjao svoju lozinku
+        return (email != null // email nije null
+                && email.equals(user.getEmail()) // email iz tokena se podudara sa email-om korisnika iz baze
+                && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate())); // nakon kreiranja tokena korisnik nije menjao lozinku
     }
 
     /**

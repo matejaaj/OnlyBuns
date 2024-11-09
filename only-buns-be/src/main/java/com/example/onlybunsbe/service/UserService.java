@@ -28,6 +28,10 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public User findByEmail(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email);
+    }
+
     // Pronalazi korisnika po ID-u
     public User findById(Long id) throws AccessDeniedException {
         return userRepository.findById(id).orElse(null);
@@ -50,7 +54,7 @@ public class UserService {
         u.setLastName(userRequest.getLastname());
         u.setEnabled(true);
         u.setEmail(userRequest.getEmail());
-
+        u.setAddress(userRequest.getAddress());
         Role role = roleService.findByName("ROLE_USER").orElseThrow(() -> new RuntimeException("Role 'ROLE_USER' not found"));
         u.setRole(role);
 

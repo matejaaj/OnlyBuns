@@ -39,23 +39,22 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-
-        String username;
+        String email;
 
         // 1. Preuzimanje JWT tokena iz zahteva
         String authToken = tokenUtils.getToken(request);
 
         try {
-
             if (authToken != null) {
 
-                // 2. Citanje korisnickog imena iz tokena
-                username = tokenUtils.getUsernameFromToken(authToken);
+                // 2. Citanje email adrese iz tokena
+                email = tokenUtils.getEmailFromToken(authToken);  // Metoda getEmailFromToken mora biti u TokenUtils
 
-                if (username != null) {
+                if (email != null) {
 
-                    // 3. Preuzimanje korisnika na osnovu username-a
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    // 3. Preuzimanje korisnika na osnovu email-a
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
                     // 4. Provera da li je prosledjeni token validan
                     if (tokenUtils.validateToken(authToken, userDetails)) {
 
@@ -66,7 +65,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
             }
-
         } catch (ExpiredJwtException ex) {
             LOGGER.debug("Token expired!");
         }
