@@ -1,4 +1,4 @@
-package com.example.onlybunsbe.CORS;
+package com.example.onlybunsbe.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

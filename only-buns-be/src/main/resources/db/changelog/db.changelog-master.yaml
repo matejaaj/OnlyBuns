@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+<!-- Tabela za uloge -->
+<changeSet id="1" author="tvoje_ime">
+<createTable tableName="roles">
+<column name="id" type="BIGINT" autoIncrement="true">
+<constraints primaryKey="true" nullable="false"/>
+</column>
+<column name="name" type="VARCHAR(50)">
+<constraints unique="true" nullable="false"/>
+</column>
+</createTable>
+</changeSet>
+
+<!-- Tabela za korisnike -->
+<changeSet id="2" author="tvoje_ime">
+<createTable tableName="users">
+<column name="id" type="BIGINT" autoIncrement="true">
+<constraints primaryKey="true" nullable="false"/>
+</column>
+<column name="email" type="VARCHAR(255)">
+<constraints unique="true" nullable="false"/>
+</column>
+<column name="username" type="VARCHAR(100)">
+<constraints unique="true" nullable="false"/>
+</column>
+<column name="password" type="VARCHAR(255)">
+<constraints nullable="false"/>
+</column>
+<column name="first_name" type="VARCHAR(100)">
+<constraints nullable="false"/>
+</column>
+<column name="last_name" type="VARCHAR(100)">
+<constraints nullable="false"/>
+</column>
+<column name="address" type="VARCHAR(255)"/>
+<column name="enabled" type="BOOLEAN" defaultValueBoolean="false"/>
+<column name="last_password_reset_date" type="TIMESTAMP"/>
+<column name="activation_token" type="VARCHAR(255)"/>
+<column name="registered_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+<column name="role_id" type="BIGINT">
+<constraints nullable="true" foreignKeyName="fk_user_role" referencedTableName="roles" referencedColumnNames="id"/>
+</column>
+</createTable>
+</changeSet>
+
+<!-- Tabela za objave -->
+<changeSet id="3" author="tvoje_ime">
+<createTable tableName="posts">
+<column name="id" type="BIGINT" autoIncrement="true">
+<constraints primaryKey="true" nullable="false"/>
+</column>
+<column name="description" type="TEXT">
+<constraints nullable="false"/>
+</column>
+<column name="image_url" type="VARCHAR(255)"/>
+<column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+<column name="latitude" type="DOUBLE PRECISION"/>
+<column name="longitude" type="DOUBLE PRECISION"/>
+<column name="user_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_post_user" referencedTableName="users" referencedColumnNames="id"/>
+</column>
+</createTable>
+</changeSet>
+
+<!-- Tabela za lajkove -->
+<changeSet id="4" author="tvoje_ime">
+<createTable tableName="likes">
+<column name="id" type="BIGINT" autoIncrement="true">
+<constraints primaryKey="true" nullable="false"/>
+</column>
+<column name="post_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_like_post" referencedTableName="posts" referencedColumnNames="id"/>
+</column>
+<column name="user_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_like_user" referencedTableName="users" referencedColumnNames="id"/>
+</column>
+<column name="liked_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+</createTable>
+</changeSet>
+
+<!-- Tabela za komentare -->
+<changeSet id="5" author="tvoje_ime">
+<createTable tableName="comments">
+<column name="id" type="BIGINT" autoIncrement="true">
+<constraints primaryKey="true" nullable="false"/>
+</column>
+<column name="post_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_comment_post" referencedTableName="posts" referencedColumnNames="id"/>
+</column>
+<column name="user_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_comment_user" referencedTableName="users" referencedColumnNames="id"/>
+</column>
+<column name="content" type="TEXT">
+<constraints nullable="false"/>
+</column>
+<column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+</createTable>
+</changeSet>
+
+<!-- Tabela za obaveštenja -->
+<changeSet id="6" author="tvoje_ime">
+<createTable tableName="notifications">
+<column name="id" type="BIGINT" autoIncrement="true">
+<constraints primaryKey="true" nullable="false"/>
+</column>
+<column name="user_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_notification_user" referencedTableName="users" referencedColumnNames="id"/>
+</column>
+<column name="content" type="TEXT">
+<constraints nullable="false"/>
+</column>
+<column name="sent_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+<column name="is_read" type="BOOLEAN" defaultValueBoolean="false"/>
+</createTable>
+</changeSet>
+
+<!-- Tabela za lokacije za brigu o ljubimcima -->
+<changeSet id="7" author="tvoje_ime">
+<createTable tableName="pet_care_locations">
+<column name="id" type="BIGINT" autoIncrement="true">
+<constraints primaryKey="true" nullable="false"/>
+</column>
+<column name="name" type="VARCHAR(255)">
+<constraints nullable="false"/>
+</column>
+<column name="latitude" type="DOUBLE PRECISION">
+<constraints nullable="false"/>
+</column>
+<column name="longitude" type="DOUBLE PRECISION">
+<constraints nullable="false"/>
+</column>
+<column name="description" type="TEXT"/>
+</createTable>
+</changeSet>
+
+<!-- Tabela za praćenje korisnika -->
+<changeSet id="8" author="tvoje_ime">
+<createTable tableName="user_followers">
+<column name="user_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_follower_user" referencedTableName="users" referencedColumnNames="id"/>
+</column>
+<column name="follower_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_follower_follower" referencedTableName="users" referencedColumnNames="id"/>
+</column>
+<constraints primaryKey="user_id, follower_id"/>
+</createTable>
+</changeSet>
+
+<!-- Tabela za poruke -->
+<changeSet id="9" author="tvoje_ime">
+<createTable tableName="messages">
+<column name="id" type="BIGINT" autoIncrement="true">
+<constraints primaryKey="true" nullable="false"/>
+</column>
+<column name="content" type="TEXT">
+<constraints nullable="false"/>
+</column>
+<column name="sent_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+<column name="sender_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_message_sender" referencedTableName="users" referencedColumnNames="id"/>
+</column>
+<column name="recipient_id" type="BIGINT">
+<constraints nullable="false" foreignKeyName="fk_message_recipient" referencedTableName="users" referencedColumnNames="id"/>
+</column>
+<column name="is_read" type="BOOLEAN" defaultValueBoolean="false"/>
+</createTable>
+</changeSet>
+
+</databaseChangeLog>
