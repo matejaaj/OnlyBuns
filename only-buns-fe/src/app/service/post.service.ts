@@ -1,21 +1,32 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {PostDTO} from '../dto/post.dto';
+import { PostDTO } from '../dto/post.dto';
+import { CommentDTO } from '../dto/comment.dto';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PostService {
-  private apiUrl = 'http://localhost:8080/api/posts';
+  private postApiUrl = 'http://localhost:8080/api/posts';
+  private likeApiUrl = 'http://localhost:8080/api/likes';
+  private commentApiUrl = 'http://localhost:8080/api/comments';
 
-  constructor(private http: HttpClient) {}
-
-  getPostById(id: number): Observable<PostDTO> {
-    return this.http.get<PostDTO>(`${this.apiUrl}/${id}`);
-  }
+  constructor(private apiService: ApiService) {}
 
   getAllPosts(): Observable<PostDTO[]> {
-    return this.http.get<PostDTO[]>(this.apiUrl);
+    return this.apiService.get(this.postApiUrl);
+  }
+
+  likePost(postId: number, userId: number): Observable<void> {
+    return this.apiService.post(`${this.likeApiUrl}/${postId}?userId=${userId}`, {});
+  }
+
+  addComment(postId: number, userId: number, content: string): Observable<CommentDTO> {
+    return this.apiService.post(`${this.commentApiUrl}/${postId}?userId=${userId}`, content);
+  }
+
+  deletePost(postId: number, userId: number): Observable<void> {
+    return this.apiService.delete(`${this.postApiUrl}/${postId}?userId=${userId}`);
   }
 }

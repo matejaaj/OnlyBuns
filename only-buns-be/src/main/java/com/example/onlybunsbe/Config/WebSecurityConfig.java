@@ -63,6 +63,9 @@ public class WebSecurityConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(restAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("api/posts/**").permitAll()
+                        .requestMatchers("api/likes/**").authenticated()
+                        .requestMatchers("/comments/**").authenticated()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/foo").permitAll()

@@ -28,8 +28,12 @@ export class AuthService {
     };
     return this.apiService.post(this.loginUrl, JSON.stringify(body), loginHeaders)
       .pipe(map((res) => {
-        const token = res.body.accessToken;
-        this.saveToken(token);
+        const token = res.body?.accessToken;
+        if (token) {
+          this.saveToken(token);
+        } else {
+          console.error('Token not found in response:', res);
+        }
       }));
   }
 

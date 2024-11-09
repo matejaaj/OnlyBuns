@@ -5,6 +5,17 @@
   <p>Created At: {{ post.createdAt | date:'short' }}</p>
   <p>Likes: {{ post.likeCount }}</p>
 
+  <!-- Lajkovanje -->
+  <button *ngIf="authService.isAuthenticated()" (click)="likePost(post.id)" [disabled]="post.isLiked">
+    {{ post.isLiked ? 'Liked' : 'Like' }}
+  </button>
+
+  <!-- Polje za dodavanje komentara -->
+  <div *ngIf="isLoggedIn()">
+    <input [(ngModel)]="post.newCommentContent" placeholder="Add a comment...">
+    <button (click)="addComment(post.id, post.newCommentContent)">Comment</button>
+  </div>
+
   <h3>Comments</h3>
   <ul>
     <li *ngFor="let comment of post.comments">
@@ -12,5 +23,11 @@
       <small>{{ comment.createdAt | date:'short' }}</small>
     </li>
   </ul>
+
+  <!-- Prikazivanje opcija za uređivanje i brisanje samo vlasniku objave -->
+  <div *ngIf="isOwner(post.userId)">
+    <button (click)="editPost(post.id)">Edit</button>
+    <button (click)="deletePost(post.id)">Delete</button>
+  </div>
   <hr />
 </div>

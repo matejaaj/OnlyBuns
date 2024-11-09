@@ -1,14 +1,13 @@
 package com.example.onlybunsbe.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -17,8 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-
-@Table(name="users")
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User implements UserDetails {
 
     private static final long serialVersionUID = 1L;
@@ -66,98 +68,25 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @Column(name = "activation_token")
-    private String activationToken; // Polje za aktivacioni token za email verifikaciju
+    private String activationToken;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id") // Naziv kolone u User tabeli koja pokazuje na Role
+    @JoinColumn(name = "role_id")
     private Role role;
 
-    // Getteri i setteri
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 
-    public Integer getId() {
-        return Math.toIntExact(id);
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private Set<User> followers;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-        this.setLastPasswordResetDate(new Timestamp(new Date().getTime()));
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getActivationToken() {
-        return activationToken;
-    }
-
-    public void setActivationToken(String activationToken) {
-        this.activationToken = activationToken;
-    }
-
-    public Timestamp getLastPasswordResetDate() {
-        return lastPasswordResetDate;
-    }
-
-    public void setLastPasswordResetDate(Timestamp lastPasswordResetDate) {
-        this.lastPasswordResetDate = lastPasswordResetDate;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
+    @ManyToMany(mappedBy = "followers")
+    private Set<User> following;
 
     @JsonIgnore
     @Override
@@ -183,32 +112,8 @@ public class User implements UserDetails {
         return true;
     }
 
-    // Veza sa postovima korisnika
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
-
-    // Lista korisnika koje prate ovog korisnika (followeri)
-    @ManyToMany
-    @JoinTable(
-            name = "user_followers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "follower_id")
-    )
-    private Set<User> followers;
-
-    // Lista korisnika koje ovaj korisnik prati (following)
-    @ManyToMany(mappedBy = "followers")
-    private Set<User> following;
-
-    public Set<User> getFollowers() {
-        return followers;
-    }
-
-    public Set<User> getFollowing() {
-        return following;
-    }
-
-    public List<Post> getPosts() {
-        return posts;
+    public void setPassword(String password) {
+        this.password = password;
+        this.lastPasswordResetDate = new Timestamp(new Date().getTime());
     }
 }
