@@ -1,6 +1,9 @@
 package com.example.onlybunsbe.DTO;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,11 +11,10 @@ import java.util.List;
 public class PostDTO {
     private Long id;
     private String description;
-    private String imageUrl;
     private LocalDateTime createdAt;
-    private Double latitude;
-    private Double longitude;
     private Long userId;
-    private int likeCount; // Dodato polje za broj lajkova
-    private List<CommentDTO> comments; // Lista komentara
+    private ImageDTO image;
+    private LocationDTO location;
+    private int likeCount;
+    private List<CommentDTO> comments;
 }

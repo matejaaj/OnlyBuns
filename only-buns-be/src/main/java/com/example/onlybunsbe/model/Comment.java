@@ -16,7 +16,7 @@ import java.time.Instant;
 @Table(name = "comments")
 public class Comment {
     @Id
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)

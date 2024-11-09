@@ -19,16 +19,16 @@ import java.util.List;
 @Table(name = "posts")
 public class Post {
     @Id
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotNull
     @Column(name = "description", nullable = false, length = Integer.MAX_VALUE)
     private String description;
 
-    @Size(max = 255)
-    @Column(name = "image_url")
-    private String imageUrl;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Image image;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -52,5 +52,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-
+    @ManyToOne
+    @JoinColumn(name="location_id")
+    private Location location;
 }

@@ -67,6 +67,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/foo").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/posts/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
