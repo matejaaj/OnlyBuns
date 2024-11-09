@@ -16,8 +16,13 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+
 @Table(name="users")
 public class User implements UserDetails {
+    @Id
+    @Column(name = "id", nullable = false)
+    private Integer id;
+
 
     private static final long serialVersionUID = 1L;
 

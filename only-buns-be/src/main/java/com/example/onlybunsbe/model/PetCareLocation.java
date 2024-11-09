@@ -16,7 +16,6 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "pet_care_locations")
 public class PetCareLocation {
     @Id
-    @ColumnDefault("nextval('pet_care_locations_id_seq')")
     @Column(name = "id", nullable = false)
     private Integer id;
 
