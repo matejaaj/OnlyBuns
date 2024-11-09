@@ -1,21 +1,42 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { ApiService } from './api.service';
+import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { UserDTO} from '../dto/user.dto';
+import {UserDTO} from '../dto/user.dto';
+import {HttpParams} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8080/api/users';
 
-  constructor(private http: HttpClient) {}
+  private readonly whoamiUrl = 'http://localhost:8080/api/whoami'; // URL za trenutnog korisnika
+  private readonly usersUrl = 'http://localhost:8080/api/user/all'; // URL za listu svih korisnika (samo za admin)
 
-  getUsers(sortBy: string = 'email', isAscending: boolean = true): Observable<UserDTO[]> {
-    let params = new HttpParams()
-      .set('sortBy', sortBy)
-      .set('isAscending', isAscending.toString());
-    return this.http.get<UserDTO[]>(this.apiUrl, { params });
+  currentUser!: any;
+
+  constructor(private apiService: ApiService) {}
+
+  // Metoda za preuzimanje informacija o trenutno prijavljenom korisniku
+  getMyInfo(): Observable<any> {
+    return this.apiService.get(this.whoamiUrl)
+      .pipe(map(user => {
+        this.currentUser = user; // Čuva trenutnog korisnika u `currentUser`
+        return user;
+      }));
   }
 
+  // Metoda za preuzimanje liste svih korisnika (samo za admina)
+  getAll(): Observable<any> {
+    return this.apiService.get(this.usersUrl);
+  }
+
+  getUsers(sortBy: string = 'email', isAscending: boolean = true): Observable<UserDTO[]> {
+    const args = {
+      sortBy: sortBy,
+      isAscending: isAscending.toString()
+    };
+
+    return this.apiService.get(this.usersUrl, args);
+  }
 }

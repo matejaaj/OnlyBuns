@@ -16,7 +16,6 @@ import java.time.Instant;
 @Table(name = "likes")
 public class Like {
     @Id
-    @ColumnDefault("nextval('likes_id_seq')")
     @Column(name = "id", nullable = false)
     private Integer id;
 
