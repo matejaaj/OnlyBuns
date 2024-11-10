@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -22,5 +24,8 @@ public class Image {
 
     @NotNull
     private boolean isCompressed;
+
+    @NotNull
+    private LocalDateTime uploadedAt;
 
 }
