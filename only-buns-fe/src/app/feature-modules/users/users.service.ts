@@ -39,22 +39,14 @@ export class UserService {
     minPosts?: number;
     maxPosts?: number;
   }): Observable<User[]> {
-    let httpParams = new HttpParams()
-      .set('sortBy', params.sortBy)
-      .set('isAscending', String(params.isAscending));
 
-    if (params.name) httpParams = httpParams.set('name', params.name);
-    if (params.email) httpParams = httpParams.set('email', params.email);
-    if (params.minPosts !== undefined)
-      httpParams = httpParams.set('minPosts', String(params.minPosts));
-    if (params.maxPosts !== undefined)
-      httpParams = httpParams.set('maxPosts', String(params.maxPosts));
+    // Kreiramo URL string sa svim parametrima, uključujući i prazne vrednosti
+    const url = `http://localhost:8080/api/user/sort?sortBy=${params.sortBy}&isAscending=${params.isAscending}` +
+      `&name=${params.name || ''}&email=${params.email || ''}` +
+      `&minPosts=${params.minPosts !== undefined ? params.minPosts : ''}` +
+      `&maxPosts=${params.maxPosts !== undefined ? params.maxPosts : ''}`;
 
-    console.log('Sending HTTP parameters:', httpParams.toString());
-
-    console.log('SLANJE GET ZAHTEVA ZA USEREEE');
-    return this.apiService.get('http://localhost:8080/api/user/sort', {
-      params: httpParams,
-    });
+    console.log("Sending direct URL with parameters:", url);
+    return this.apiService.get(url);
   }
 }
