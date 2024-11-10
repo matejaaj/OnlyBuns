@@ -42,6 +42,7 @@ export class LoginComponent {
 
     this.authService.login(loginData).subscribe({
       next: () => {
+        console.log(loginData);
         this.router.navigate(['/']); // Navigacija na početnu stranu nakon uspešne prijave
       },
       error: err => {

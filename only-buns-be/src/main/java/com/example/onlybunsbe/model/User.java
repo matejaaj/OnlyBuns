@@ -1,27 +1,31 @@
 package com.example.onlybunsbe.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Getter
-@Setter
-@Table(name="users")
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User implements UserDetails {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -65,11 +69,25 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @Column(name = "activation_token")
-    private String activationToken; // Polje za aktivacioni token za email verifikaciju
+    private String activationToken;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id") // Naziv kolone u User tabeli koja pokazuje na Role
+    @JoinColumn(name = "role_id")
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private Set<User> followers;
+
+    @ManyToMany(mappedBy = "followers")
+    private Set<User> following;
 
     @JsonIgnore
     @Override
@@ -93,5 +111,10 @@ public class User implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+        this.lastPasswordResetDate = new Timestamp(new Date().getTime());
     }
 }

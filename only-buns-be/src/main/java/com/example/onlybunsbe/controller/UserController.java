@@ -5,19 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.onlybunsbe.DTO.UserDTO;
 import com.example.onlybunsbe.model.User;
 import com.example.onlybunsbe.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 
 
 // Primer kontrolera cijim metodama mogu pristupiti samo autorizovani korisnici
@@ -37,7 +34,6 @@ public class UserController {
     // Ukoliko nema, server ce vratiti gresku 403 Forbidden
     // Korisnik jeste autentifikovan, ali nije autorizovan da pristupi resursu
     @GetMapping("/user/{userId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
 
     public User loadById(@PathVariable Long userId) {
         return this.userService.findById(userId);
@@ -61,5 +57,20 @@ public class UserController {
         Map<String, String> fooObj = new HashMap<>();
         fooObj.put("foo", "bar");
         return fooObj;
+    }
+
+    // Endpoint za dobijanje svih korisnika sa opcijom sortiranja
+    @GetMapping("/user/sort")
+    public ResponseEntity<List<UserDTO>> getAllUsers(
+            @RequestParam(value = "sortBy", defaultValue = "email") String sortBy,
+            @RequestParam(value = "isAscending", defaultValue = "true") boolean isAscending,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "minPosts", required = false) Integer minPosts,
+            @RequestParam(value = "maxPosts", required = false) Integer maxPosts) {
+
+        System.out.print(name +" "+ email + " " + minPosts + " "  + maxPosts + " _____________________________________");
+        List<UserDTO> users = userService.getAllUsers(name, email, minPosts, maxPosts, sortBy, isAscending);
+        return ResponseEntity.ok(users);
     }
 }

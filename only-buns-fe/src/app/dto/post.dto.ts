@@ -10,4 +10,6 @@ export interface PostDTO {
   userId: number;
   likeCount: number;
   comments: CommentDTO[];
+  isLiked?: boolean; // Dodatno polje za praćenje lajka
+  newCommentContent?: string; // Polje za unos novog komentara
 }

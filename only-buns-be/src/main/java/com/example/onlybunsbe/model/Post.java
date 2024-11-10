@@ -38,7 +38,7 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id")
-    private com.example.onlybunsbe.model.User user;
+    private User user;
 
     // Dodajemo polje likes da predstavlja lajkove povezane sa objavom
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

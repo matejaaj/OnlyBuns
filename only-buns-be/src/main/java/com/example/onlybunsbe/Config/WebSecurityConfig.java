@@ -64,22 +64,25 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(restAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/posts/**").permitAll()
+                        .requestMatchers("api/user/**").authenticated()
+                        .requestMatchers("/api/likes/**").authenticated()// `ROLE_USER` će se automatski prepoznati
+                        .requestMatchers("/api/comments/**").authenticated() // Više uloga, korisnik mora imati barem jednu
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/foo").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/posts/**").permitAll()
                         .anyRequest().authenticated()
                 )
-
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userDetailsService()),
-                        UsernamePasswordAuthenticationFilter.class); // Dodaj redosled
+                        UsernamePasswordAuthenticationFilter.class);
 
         http.authenticationProvider(authenticationProvider());
 
         return http.build();
     }
+
 
 
 

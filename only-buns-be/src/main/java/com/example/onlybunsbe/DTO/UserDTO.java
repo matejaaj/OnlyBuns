@@ -14,4 +14,7 @@ public class UserDTO {
     private boolean isActive;
     private LocalDateTime registeredAt;
     private String role;
+    private int postCount;         // Broj objava
+    private int followingCount;     // Broj korisnika koje prati
+    private int followerCount;      // Broj pratilaca
 }

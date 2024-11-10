@@ -1,17 +1,14 @@
-.post-image {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin: 10px 0;
+button {
+  padding: 5px 10px;
+  margin: 5px;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
-li {
-  margin: 8px 0;
-  padding: 8px;
-  border-bottom: 1px solid #ccc;
+button.liked {
+  background-color: #3b5998;
+  color: white;
 }
