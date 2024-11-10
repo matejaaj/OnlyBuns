@@ -104,7 +104,7 @@ export class AuthService {
     if (!userId) return false;
 
     const role = await this.fetchUserRole(userId.toString());
-    this.isAdminFlag = (role === 'ADMIN'); // Postavlja konačnu vrednost na osnovu uloge
+    this.isAdminFlag = (role === 'ROLE_ADMIN'); // Postavlja konačnu vrednost na osnovu uloge
     console.log("USER JE ADMIN "+ this.isAdminFlag);
     return this.isAdminFlag;
   }
