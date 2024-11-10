@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService } from '../post.service';
-import { PostDTO } from '../model/post';
+import { Post } from '../model/post';
 import { Comment } from '../model/comment';
 import { AuthService } from '../../../infrastructure/auth/auth.service';
 import { Like } from '../model/like';
 import { Observable } from 'rxjs';
 
-interface ExtendedPostDTO extends PostDTO {
+interface ExtendedPostDTO extends Post {
   isLiked: boolean;
   newCommentContent?: string;
   isEditing?: boolean; // Flag za uređivanje

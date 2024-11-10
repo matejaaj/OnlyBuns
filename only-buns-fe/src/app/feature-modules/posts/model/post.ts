@@ -1,15 +1,14 @@
 import { Comment } from './comment';
+import { Image } from '../../../shared/model/image';
+import { Location } from '../../../shared/model/location';
 
-export interface PostDTO {
+export interface Post {
   id: number;
   description: string;
-  imageUrl: string;
-  createdAt: string;
-  latitude: number;
-  longitude: number;
+  createdAt: Date;
   userId: number;
+  image: Image;
+  location: Location;
   likeCount: number;
   comments: Comment[];
-  isLiked?: boolean; // Dodatno polje za praćenje lajka
-  newCommentContent?: string; // Polje za unos novog komentara
 }

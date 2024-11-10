@@ -25,7 +25,7 @@ export enum RequestMethod {
 export class ApiService {
   headers = new HttpHeaders({
     Accept: 'application/json',
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json', // Ovo zaglavlje će se preskočiti za FormData
   });
 
   constructor(private http: HttpClient) {}
@@ -57,19 +57,21 @@ export class ApiService {
     path: string,
     body: any,
     method = RequestMethod.Post,
-    custemHeaders?: HttpHeaders
+    customHeaders?: HttpHeaders
   ): Observable<any> {
-    const req = new HttpRequest(method, path, body, {
-      headers: custemHeaders || this.headers,
-    });
+    // Ako je body tipa FormData, uklanjamo Content-Type zaglavlje
+    const headers =
+      body instanceof FormData
+        ? customHeaders || new HttpHeaders({ Accept: 'application/json' })
+        : customHeaders || this.headers;
 
-    return (
-      this.http
-        .request(req)
-        .pipe(filter((response) => response instanceof HttpResponse))
-        // .pipe(map((response: HttpResponse<any>) => response.body))
-        .pipe(catchError((error) => this.checkError(error)))
-    );
+    const req = new HttpRequest(method, path, body, { headers });
+
+    return this.http
+      .request(req)
+      .pipe(filter((response) => response instanceof HttpResponse))
+      .pipe(map((response: HttpResponse<any>) => response.body))
+      .pipe(catchError((error) => this.checkError(error)));
   }
 
   private checkError(error: any): any {

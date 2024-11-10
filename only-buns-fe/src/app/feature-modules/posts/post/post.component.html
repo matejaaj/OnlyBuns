@@ -1,30 +1,45 @@
 <h1>All Posts</h1>
 <div *ngFor="let post of posts">
-  <!-- Prikazivanje opisa samo kao teksta, bez JSON strukture -->
   <h2 *ngIf="!post.isEditing">{{ post.description }}</h2>
-  <input *ngIf="post.isEditing" [(ngModel)]="post.newDescription" placeholder="Enter new description" />
+  <input
+    *ngIf="post.isEditing"
+    [(ngModel)]="post.newDescription"
+    placeholder="Enter new description"
+  />
 
-  <img *ngIf="post.imageUrl" [src]="post.imageUrl" alt="Post Image" class="post-image">
-  <p>Created At: {{ post.createdAt | date:'short' }}</p>
+  <img
+    *ngIf="post.image.path"
+    [src]="post.image.path"
+    alt="Post Image"
+    class="post-image"
+  />
+  <p>Created At: {{ post.createdAt | date : "short" }}</p>
   <p>Likes: {{ post.likeCount }}</p>
 
-  <button *ngIf="!post.isLiked && authService.isAuthenticated()" (click)="likePost(post.id)">
+  <button
+    *ngIf="!post.isLiked && authService.isAuthenticated()"
+    (click)="likePost(post.id)"
+  >
     Like
   </button>
-  <button *ngIf="post.isLiked" disabled>
-    Liked
-  </button>
+  <button *ngIf="post.isLiked" disabled>Liked</button>
 
   <div *ngIf="authService.isAuthenticated()">
-    <input [(ngModel)]="post.newCommentContent" placeholder="Add a comment...">
-    <button (click)="addComment(post.id, post.newCommentContent)">Comment</button>
+    <input
+      [(ngModel)]="post.newCommentContent"
+      placeholder="Add a comment..."
+    />
+    <button (click)="addComment(post.id, post.newCommentContent)">
+      Comment
+    </button>
   </div>
 
   <h3>Comments</h3>
   <ul>
     <li *ngFor="let comment of post.comments">
-      <strong>{{ comment.userName }}</strong>: {{ comment.content }} <br />
-      <small>{{ comment.createdAt | date:'short' }}</small>
+      <strong>{{ comment.userName }}</strong
+      >: {{ comment.content }} <br />
+      <small>{{ comment.createdAt | date : "short" }}</small>
     </li>
   </ul>
 
