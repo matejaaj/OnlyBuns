@@ -31,12 +31,26 @@ export class UserService {
     return this.apiService.get(this.usersUrl);
   }
 
-  getUsers(sortBy: string = 'email', isAscending: boolean = true): Observable<UserDTO[]> {
-    const args = {
-      sortBy: sortBy,
-      isAscending: isAscending.toString()
-    };
+  getUsers(params: {
+    sortBy: string;
+    isAscending: boolean;
+    name?: string;
+    email?: string;
+    minPosts?: number;
+    maxPosts?: number;
+  }): Observable<UserDTO[]> {
+    let httpParams = new HttpParams()
+      .set('sortBy', params.sortBy)
+      .set('isAscending', String(params.isAscending));
 
-    return this.apiService.get(this.usersUrl, args);
+    if (params.name) httpParams = httpParams.set('name', params.name);
+    if (params.email) httpParams = httpParams.set('email', params.email);
+    if (params.minPosts !== undefined) httpParams = httpParams.set('minPosts', String(params.minPosts));
+    if (params.maxPosts !== undefined) httpParams = httpParams.set('maxPosts', String(params.maxPosts));
+
+    console.log("Sending HTTP parameters:", httpParams.toString());
+
+    console.log("SLANJE GET ZAHTEVA ZA USEREEE");
+    return this.apiService.get('http://localhost:8080/api/user/sort', { params: httpParams });
   }
 }

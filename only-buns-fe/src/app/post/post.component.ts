@@ -4,6 +4,7 @@ import { PostDTO } from '../dto/post.dto';
 import { CommentDTO } from '../dto/comment.dto';
 import { AuthService } from '../service/auth.service';
 import {LikeDTO} from '../dto/like.dto';
+import {Observable} from 'rxjs';
 
 interface ExtendedPostDTO extends PostDTO {
   isLiked: boolean;
@@ -23,7 +24,11 @@ export class PostComponent implements OnInit {
   constructor(private postService: PostService, protected authService: AuthService) {}
 
   ngOnInit(): void {
-    this.loadLikes();
+    if(this.authService.isAuthenticated() == false){
+      this.loadPosts();
+    }else{
+      this.loadLikes();
+    }
   }
 
   loadPosts(): void {
@@ -84,7 +89,7 @@ export class PostComponent implements OnInit {
   }
 
   getCurrentUserId(): number {
-    return 1;
+    return this.authService.getUserId();
   }
 
 // Omogućava uređivanje

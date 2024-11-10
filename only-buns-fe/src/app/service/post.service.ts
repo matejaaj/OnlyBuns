@@ -16,6 +16,7 @@ export class PostService {
   constructor(private apiService: ApiService) {}
 
   getAllPosts(): Observable<PostDTO[]> {
+    console.log("salje se zahtev");
     return this.apiService.get(this.postApiUrl);
   }
 

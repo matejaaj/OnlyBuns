@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.example.onlybunsbe.DTO.UserDTO;
 import com.example.onlybunsbe.DTO.UserRequest;
@@ -65,29 +66,44 @@ public class UserService {
 
         return this.userRepository.save(u);
     }
-    // Metoda za dobijanje liste svih korisnika sa opcijom sortiranja
-    public List<UserDTO> getAllUsers(String sortBy, boolean isAscending) {
+    public List<UserDTO> getAllUsers(String name, String email, Integer minPosts, Integer maxPosts, String sortBy, boolean isAscending) {
         List<User> users = userRepository.findAll();
 
-        // Primeni sortiranje na osnovu parametra
-        Comparator<User> comparator;
-        if ("followers".equals(sortBy)) {
-            comparator = Comparator.comparingInt(user -> user.getFollowers().size());
-        } else {
-            comparator = Comparator.comparing(User::getEmail);
-        }
+        System.out.println("Filter criteria - Name: " + name + ", Email: " + email + ", Min Posts: " + minPosts + ", Max Posts: " + maxPosts);
 
-        // Obrni redosled ako nije rastuće
+        // Primeni pretragu
+        Stream<User> filteredUsers = users.stream()
+                .filter(user -> {
+                    boolean nameMatch = (name == null || user.getFirstName().contains(name) || user.getLastName().contains(name));
+                    boolean emailMatch = (email == null || user.getEmail().contains(email));
+                    boolean minPostsMatch = (minPosts == null || user.getPosts().size() >= minPosts);
+                    boolean maxPostsMatch = (maxPosts == null || user.getPosts().size() <= maxPosts);
+
+                    System.out.println("Checking user: " + user.getEmail() + " - Name match: " + nameMatch + ", Email match: " + emailMatch +
+                            ", Min Posts match: " + minPostsMatch + ", Max Posts match: " + maxPostsMatch);
+
+                    return nameMatch && emailMatch && minPostsMatch && maxPostsMatch;
+                });
+
+        // Primeni sortiranje
+        Comparator<User> comparator = "followers".equals(sortBy)
+                ? Comparator.comparingInt(user -> user.getFollowers().size())
+                : Comparator.comparing(User::getEmail);
+
         if (!isAscending) {
             comparator = comparator.reversed();
         }
 
-        // Sortiraj i konvertuj korisnike u DTO
-        return users.stream()
+        // Sortiraj i mapiraj u DTO
+        List<UserDTO> result = filteredUsers
                 .sorted(comparator)
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+
+        System.out.println("Filtered and sorted users: " + result.size());
+        return result;
     }
+
 
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();

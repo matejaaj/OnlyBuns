@@ -9,8 +9,14 @@ import { UserDTO } from '../app/dto/user.dto';
 })
 export class UserListComponent implements OnInit {
   users: UserDTO[] = [];
-  sortBy = 'email'; // Podrazumevani kriterijum sortiranja
-  isAscending = true; // Podrazumevani smer sortiranja (rastuće)
+  sortBy = 'email';
+  isAscending = true;
+
+  // Parametri pretrage
+  searchName = '';
+  searchEmail = '';
+  minPosts: number | null = null;
+  maxPosts: number | null = null;
 
   constructor(private userService: UserService) {}
 
@@ -19,20 +25,39 @@ export class UserListComponent implements OnInit {
   }
 
   loadUsers(): void {
-    this.userService.getUsers(this.sortBy, this.isAscending).subscribe(data => {
+    console.log("Parameters sent to getUsers:", {
+      sortBy: this.sortBy,
+      isAscending: this.isAscending,
+      name: this.searchName || undefined,
+      email: this.searchEmail || undefined,
+      minPosts: this.minPosts !== null ? this.minPosts : undefined,
+      maxPosts: this.maxPosts !== null ? this.maxPosts : undefined
+    });
+
+    this.userService.getUsers({
+      sortBy: this.sortBy,
+      isAscending: this.isAscending,
+      name: this.searchName || undefined,
+      email: this.searchEmail || undefined,
+      minPosts: this.minPosts !== null ? this.minPosts : undefined,
+      maxPosts: this.maxPosts !== null ? this.maxPosts : undefined
+    }).subscribe((data: UserDTO[]) => {
       this.users = data;
+      console.log("Filtered users:", this.users);
     });
   }
 
   onSortChange(sortBy: string): void {
-    // Ako je isti kriterijum, promeni smer sortiranja
     if (this.sortBy === sortBy) {
       this.isAscending = !this.isAscending;
     } else {
-      // Ako je novi kriterijum, postavi na podrazumevani (rastući)
       this.sortBy = sortBy;
       this.isAscending = true;
     }
+    this.loadUsers();
+  }
+
+  onSearch(): void {
     this.loadUsers();
   }
 }

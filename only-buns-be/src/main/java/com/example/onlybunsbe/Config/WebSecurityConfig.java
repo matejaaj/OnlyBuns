@@ -64,6 +64,7 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(restAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/posts/**").permitAll()
+                        .requestMatchers("api/user/**").authenticated()
                         .requestMatchers("/api/likes/**").authenticated()// `ROLE_USER` će se automatski prepoznati
                         .requestMatchers("/api/comments/**").authenticated() // Više uloga, korisnik mora imati barem jednu
                         .requestMatchers("/auth/**").permitAll()

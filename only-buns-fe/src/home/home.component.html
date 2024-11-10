@@ -2,10 +2,10 @@
 <p>This is the home page of our application.</p>
 
 <!-- Prikazuje se samo ako je korisnik ulogovan -->
-<button *ngIf="authService.isAuthenticated()" routerLink="/posts">See Posts</button>
 <button *ngIf="authService.isAuthenticated()" (click)="logout()">Logout</button>
 <button routerLink="/posts">See Posts</button>
-<button routerLink="/users">See Users</button>
+<button *ngIf="authService.isAdmin()" routerLink="/users">See Users</button>
+
 <!-- Prikazuje se samo ako korisnik NIJE ulogovan -->
 <button *ngIf="!authService.isAuthenticated()" routerLink="/signup">Sign Up</button>
 <button *ngIf="!authService.isAuthenticated()" routerLink="/login">Login</button>

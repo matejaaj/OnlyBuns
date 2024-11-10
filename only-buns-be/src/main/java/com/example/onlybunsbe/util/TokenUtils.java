@@ -55,10 +55,12 @@ public class TokenUtils {
      * @param email Korisničko ime korisnika kojem se token izdaje
      * @return JWT token
      */
-    public String generateToken(String email) {
+    public String generateToken(String email, Long userId, String role) {
         return Jwts.builder()
                 .setIssuer(APP_NAME)
-                .setSubject(email)  // Koristi email kao subject
+                .setSubject(email)
+                .claim("userId", userId)
+                .claim("role", role)
                 .setAudience(generateAudience())
                 .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate())
@@ -151,7 +153,38 @@ public class TokenUtils {
 
         return username;
     }
+    public Long getUserIdFromToken(String token) {
+        Long userId;
+        try {
+            final Claims claims = this.getAllClaimsFromToken(token);
+                userId = claims.get("userId", Integer.class) != null ? Long.valueOf(claims.get("userId", Integer.class)) : null;
+                if (userId == null) {
+                    System.out.println("Warning: userId extracted as null from claims!"); // Ispis ako je userId null
+                } else {
+                    System.out.println("Extracted userId from claims: " + userId); // Ispis ako userId nije null
+                }
+        } catch (ExpiredJwtException ex) {
+            throw ex;
+        } catch (Exception e) {
+            System.out.println("Exception when extracting userId: " + e.getMessage());
+            userId = null;
+        }
+        return userId;
+    }
 
+    public String getRoleFromToken(String token) {
+        String role;
+        try {
+            final Claims claims = this.getAllClaimsFromToken(token);
+            role = claims.get("role", String.class);
+            System.out.println("Extracted role from claims: " + role);
+        } catch (ExpiredJwtException ex) {
+            throw ex;
+        } catch (Exception e) {
+            role = null;
+        }
+        return role;
+    }
 
     /**
      * Funkcija za preuzimanje datuma kreiranja tokena.
