@@ -8,4 +8,7 @@ export interface UserDTO {
   isActive: boolean;
   registeredAt: Date;
   role: string;
+  postCount: number;        // Broj objava
+  followingCount: number;    // Broj korisnika koje prati
+  followerCount: number;     // Broj pratilaca
 }

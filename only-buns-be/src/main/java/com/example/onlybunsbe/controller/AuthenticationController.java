@@ -54,11 +54,13 @@ public class AuthenticationController {
 
         // Kreiraj token za tog korisnika
         User user = (User) authentication.getPrincipal();
-        String jwt = tokenUtils.generateToken(user.getEmail());
+        System.out.println("User ID: " + user.getId());
+        System.out.println("User Role: " + user.getRole().getName());
+        String jwt = tokenUtils.generateToken(user.getEmail(), user.getId(), user.getRole().getName());
         int expiresIn = tokenUtils.getExpiredIn();
 
         // Vrati token kao odgovor na uspesnu autentifikaciju
-        return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
+        return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, user.getId()));
     }
 
     // Endpoint za registraciju novog korisnika

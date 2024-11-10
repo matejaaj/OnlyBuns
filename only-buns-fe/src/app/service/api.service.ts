@@ -28,11 +28,8 @@ export class ApiService {
   get(path: string, args?: any): Observable<any> {
     const options = {
       headers: this.headers,
+      params: args ? this.serialize(args) : undefined
     };
-
-    if (args) {
-      // options['params'] = this.serialize(args);
-    }
 
     return this.http.get(path, options)
       .pipe(catchError(this.checkError.bind(this)));

@@ -1,9 +1,24 @@
 <h1>All Posts</h1>
 <div *ngFor="let post of posts">
-  <h2>{{ post.description }}</h2>
+  <!-- Prikazivanje opisa samo kao teksta, bez JSON strukture -->
+  <h2 *ngIf="!post.isEditing">{{ post.description }}</h2>
+  <input *ngIf="post.isEditing" [(ngModel)]="post.newDescription" placeholder="Enter new description" />
+
   <img *ngIf="post.imageUrl" [src]="post.imageUrl" alt="Post Image" class="post-image">
   <p>Created At: {{ post.createdAt | date:'short' }}</p>
   <p>Likes: {{ post.likeCount }}</p>
+
+  <button *ngIf="!post.isLiked && authService.isAuthenticated()" (click)="likePost(post.id)">
+    Like
+  </button>
+  <button *ngIf="post.isLiked" disabled>
+    Liked
+  </button>
+
+  <div *ngIf="authService.isAuthenticated()">
+    <input [(ngModel)]="post.newCommentContent" placeholder="Add a comment...">
+    <button (click)="addComment(post.id, post.newCommentContent)">Comment</button>
+  </div>
 
   <h3>Comments</h3>
   <ul>
@@ -12,5 +27,13 @@
       <small>{{ comment.createdAt | date:'short' }}</small>
     </li>
   </ul>
+
+  <div *ngIf="isOwner(post.userId)">
+    <button *ngIf="!post.isEditing" (click)="enableEdit(post)">Edit</button>
+    <button *ngIf="post.isEditing" (click)="saveEdit(post)">Save</button>
+    <button *ngIf="post.isEditing" (click)="cancelEdit(post)">Cancel</button>
+    <button (click)="deletePost(post.id)">Delete</button>
+  </div>
+
   <hr />
 </div>
