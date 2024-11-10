@@ -26,7 +26,7 @@ public class CommentService {
     public Optional<CommentDTO> addComment(Long postId, Long userId, String content) {
         Optional<Post> post = postRepository.findById(postId);
         Optional<User> user = userRepository.findById(userId);
-
+        System.out.print("Pronadjen post = " + post + " user = " + user);
         if (post.isPresent() && user.isPresent()) {
             Comment comment = new Comment();
             comment.setPost(post.get());

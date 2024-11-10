@@ -17,9 +17,14 @@ public class CommentController {
 
     // Dodavanje komentara na objavu
     @PostMapping("/{postId}")
-    public ResponseEntity<CommentDTO> addComment(@PathVariable Long postId, @RequestParam Long userId, @RequestBody String content) {
+    public ResponseEntity<CommentDTO> addComment(@PathVariable Long postId, @RequestParam Long userId, @RequestBody CommentDTO commentRequest) {
+        String content = commentRequest.getContent();
+        System.out.println("Request received to add comment to post with ID: " + postId + " by user ID: " + userId);
         Optional<CommentDTO> commentDTO = commentService.addComment(postId, userId, content);
         return commentDTO.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build()); // Vraća 404 ako post ili user nisu pronađeni
+                .orElseGet(() -> {
+                    System.out.println("Comment could not be added - post or user not found");
+                    return ResponseEntity.notFound().build();
+                });
     }
 }

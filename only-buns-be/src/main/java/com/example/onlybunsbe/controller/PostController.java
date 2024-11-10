@@ -48,6 +48,7 @@ public class PostController {
 
     @PutMapping("/{postId}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable Long postId, @RequestParam Long userId, @RequestBody String newDescription) {
+        System.out.print(newDescription);
         Optional<PostDTO> updatedPost = postService.updatePost(postId, userId, newDescription);
         return updatedPost.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(403).build()); // Forbidden ako korisnik nije vlasnik

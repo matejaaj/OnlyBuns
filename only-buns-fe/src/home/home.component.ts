@@ -11,6 +11,7 @@ export class HomeComponent {
   constructor(public authService: AuthService) {} // Koristimo public da bismo mogli koristiti authService direktno u HTML-u
 
   logout(): void {
+    console.log(this.authService.isAuthenticated() + "   AUTHENTICATED");
     this.authService.logout();
   }
 }
