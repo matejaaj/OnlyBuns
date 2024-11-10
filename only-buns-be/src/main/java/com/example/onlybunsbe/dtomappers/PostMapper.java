@@ -1,5 +1,6 @@
 package com.example.onlybunsbe.dtomappers;
 
+import com.example.onlybunsbe.DTO.CommentDTO;
 import com.example.onlybunsbe.DTO.ImageDTO;
 import com.example.onlybunsbe.DTO.LocationDTO;
 import com.example.onlybunsbe.DTO.PostDTO;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class PostMapper {
@@ -51,6 +54,22 @@ public class PostMapper {
         locationDTO.setLatitude(post.getLocation().getLatitude());
         locationDTO.setLongitude(post.getLocation().getLongitude());
         dto.setLocation(locationDTO);
+
+        dto.setLikeCount(post.getLikes().size());
+
+        if (post.getComments() != null) {
+            List<CommentDTO> commentDTOs = post.getComments().stream().map(comment -> {
+                CommentDTO commentDTO = new CommentDTO();
+                commentDTO.setId(comment.getId());
+                commentDTO.setPostId(post.getId());
+                commentDTO.setUserId(comment.getUser().getId());
+                commentDTO.setContent(comment.getContent());
+                commentDTO.setCreatedAt(comment.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
+                commentDTO.setUserName(comment.getUser().getUsername());
+                return commentDTO;
+            }).collect(Collectors.toList());
+            dto.setComments(commentDTOs);
+        }
 
         return dto;
     }

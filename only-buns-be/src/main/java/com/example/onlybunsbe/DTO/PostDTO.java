@@ -1,8 +1,6 @@
 package com.example.onlybunsbe.DTO;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;

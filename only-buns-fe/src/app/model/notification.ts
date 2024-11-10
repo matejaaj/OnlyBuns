@@ -1,4 +1,4 @@
-export interface NotificationDTO {
+export interface Notification {
   id: number;
   userId: number;
   content: string;

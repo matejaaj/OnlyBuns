@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PostDTO } from '../dto/post.dto';
-import { CommentDTO } from '../dto/comment.dto';
+import { PostDTO } from '../model/post';
+import { Comment } from '../model/comment';
 import { ApiService } from './api.service';
-import {LikeDTO} from '../dto/like.dto';
+import { Like } from '../model/like';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PostService {
   private postApiUrl = 'http://localhost:8080/api/posts';
@@ -16,30 +16,45 @@ export class PostService {
   constructor(private apiService: ApiService) {}
 
   getAllPosts(): Observable<PostDTO[]> {
-    console.log("salje se zahtev");
+    console.log('salje se zahtev');
     return this.apiService.get(this.postApiUrl);
   }
 
   likePost(postId: number, userId: number): Observable<void> {
     console.log(postId, userId);
-    return this.apiService.post(`${this.likeApiUrl}/${postId}?userId=${userId}`, {});
+    return this.apiService.post(
+      `${this.likeApiUrl}/${postId}?userId=${userId}`,
+      {}
+    );
   }
 
-  addComment(postId: number, userId: number, content: string): Observable<CommentDTO> {
-    console.log(postId +  " userid " +userId +  " content " + content);
-    return this.apiService.post(`${this.commentApiUrl}/${postId}?userId=${userId}`, JSON.stringify({ content }));
+  addComment(
+    postId: number,
+    userId: number,
+    content: string
+  ): Observable<Comment> {
+    console.log(postId + ' userid ' + userId + ' content ' + content);
+    return this.apiService.post(
+      `${this.commentApiUrl}/${postId}?userId=${userId}`,
+      JSON.stringify({ content })
+    );
   }
 
   deletePost(postId: number, userId: number): Observable<void> {
-    return this.apiService.delete(`${this.postApiUrl}/${postId}?userId=${userId}`);
+    return this.apiService.delete(
+      `${this.postApiUrl}/${postId}?userId=${userId}`
+    );
   }
 
   updatePost(id: number, userId: number, newDescription: string) {
-    return this.apiService.put(`${this.postApiUrl}/${id}?userId=${userId}`, newDescription);
+    return this.apiService.put(
+      `${this.postApiUrl}/${id}?userId=${userId}`,
+      newDescription
+    );
   }
 
-  getLikes(): Observable<LikeDTO[]> {
-    console.log("DOBAVLJAM SVE LAJKOVE");
+  getLikes(): Observable<Like[]> {
+    console.log('DOBAVLJAM SVE LAJKOVE');
     return this.apiService.get(this.likeApiUrl);
   }
 }

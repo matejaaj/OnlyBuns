@@ -1,4 +1,4 @@
-export interface CommentDTO {
+export interface Comment {
   id: number;
   postId: number;
   userId: number;

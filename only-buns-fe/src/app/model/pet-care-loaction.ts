@@ -1,4 +1,4 @@
-export interface PetCareLocationDTO {
+export interface PetCareLocation {
   id: number;
   name: string;
   latitude: number;

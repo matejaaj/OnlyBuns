@@ -1,4 +1,4 @@
-import {CommentDTO} from './comment.dto';
+import { Comment } from './comment';
 
 export interface PostDTO {
   id: number;
@@ -9,7 +9,7 @@ export interface PostDTO {
   longitude: number;
   userId: number;
   likeCount: number;
-  comments: CommentDTO[];
+  comments: Comment[];
   isLiked?: boolean; // Dodatno polje za praćenje lajka
   newCommentContent?: string; // Polje za unos novog komentara
 }

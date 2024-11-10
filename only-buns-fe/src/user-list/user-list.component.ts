@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../app/service/user.service';
-import { UserDTO } from '../app/dto/user.dto';
+import { User } from '../app/model/user';
 
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.css']
+  styleUrls: ['./user-list.component.css'],
 })
 export class UserListComponent implements OnInit {
-  users: UserDTO[] = [];
+  users: User[] = [];
   sortBy = 'email';
   isAscending = true;
 
@@ -25,26 +25,28 @@ export class UserListComponent implements OnInit {
   }
 
   loadUsers(): void {
-    console.log("Parameters sent to getUsers:", {
+    console.log('Parameters sent to getUsers:', {
       sortBy: this.sortBy,
       isAscending: this.isAscending,
       name: this.searchName || undefined,
       email: this.searchEmail || undefined,
       minPosts: this.minPosts !== null ? this.minPosts : undefined,
-      maxPosts: this.maxPosts !== null ? this.maxPosts : undefined
+      maxPosts: this.maxPosts !== null ? this.maxPosts : undefined,
     });
 
-    this.userService.getUsers({
-      sortBy: this.sortBy,
-      isAscending: this.isAscending,
-      name: this.searchName || undefined,
-      email: this.searchEmail || undefined,
-      minPosts: this.minPosts !== null ? this.minPosts : undefined,
-      maxPosts: this.maxPosts !== null ? this.maxPosts : undefined
-    }).subscribe((data: UserDTO[]) => {
-      this.users = data;
-      console.log("Filtered users:", this.users);
-    });
+    this.userService
+      .getUsers({
+        sortBy: this.sortBy,
+        isAscending: this.isAscending,
+        name: this.searchName || undefined,
+        email: this.searchEmail || undefined,
+        minPosts: this.minPosts !== null ? this.minPosts : undefined,
+        maxPosts: this.maxPosts !== null ? this.maxPosts : undefined,
+      })
+      .subscribe((data: User[]) => {
+        this.users = data;
+        console.log('Filtered users:', this.users);
+      });
   }
 
   onSortChange(sortBy: string): void {
