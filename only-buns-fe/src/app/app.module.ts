@@ -1,21 +1,21 @@
-import {NgModule} from '@angular/core';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {HomeComponent} from '../home/home.component';
-import {AppRoutingModule} from './app-routing.module';
-import {AppComponent} from './app.component';
-import {PostComponent} from './post/post.component';
-import {TokenInterceptor} from './interceptor/TokenInterceptor';
-import {SignUpComponent} from './sign-up/sign-up.component';
-import {LoginComponent} from './login/login.component';
-import {BrowserModule} from '@angular/platform-browser';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatCardModule} from '@angular/material/card';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
-import {MatButtonModule} from '@angular/material/button';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { UserListComponent} from "../user-list/user-list.component";
+import { NgModule } from '@angular/core';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HomeComponent } from './feature-modules/layout/home/home.component';
+import { AppRoutingModule } from './infrastructure/routing/app-routing.module';
+import { AppComponent } from './app.component';
+import { PostComponent } from './feature-modules/posts/post/post.component';
+import { TokenInterceptor } from './infrastructure/interceptor/TokenInterceptor';
+import { SignUpComponent } from './infrastructure/auth/sign-up/sign-up.component';
+import { LoginComponent } from './infrastructure/auth/login/login.component';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { UserListComponent } from './feature-modules/users/user-list/user-list.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +24,7 @@ import { UserListComponent} from "../user-list/user-list.component";
     HomeComponent,
     SignUpComponent,
     LoginComponent,
-    UserListComponent
+    UserListComponent,
   ],
   imports: [
     BrowserModule,
@@ -37,15 +37,15 @@ import { UserListComponent} from "../user-list/user-list.component";
     MatButtonModule,
     MatProgressSpinnerModule, // Dodaj pravi modul za spinner
     BrowserAnimationsModule,
-    FormsModule
+    FormsModule,
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
-      multi: true
-    }
+      multi: true,
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
