@@ -63,11 +63,11 @@ public class WebSecurityConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(restAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/posts/**").permitAll()
                         .requestMatchers("api/user/**").authenticated()
                         .requestMatchers("/api/likes/**").authenticated()// `ROLE_USER` će se automatski prepoznati
                         .requestMatchers("/api/comments/**").authenticated() // Više uloga, korisnik mora imati barem jednu
-                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/foo").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
@@ -82,9 +82,6 @@ public class WebSecurityConfig {
 
         return http.build();
     }
-
-
-
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

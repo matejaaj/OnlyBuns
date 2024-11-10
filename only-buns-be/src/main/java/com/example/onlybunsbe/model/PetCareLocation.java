@@ -16,6 +16,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "pet_care_locations")
 public class PetCareLocation {
     @Id
+
     @Column(name = "id", nullable = false)
     private Integer id;
 
