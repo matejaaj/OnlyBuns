@@ -25,72 +25,89 @@ export enum RequestMethod {
 export class ApiService {
   headers = new HttpHeaders({
     Accept: 'application/json',
-    'Content-Type': 'application/json', // Ovo zaglavlje će se preskočiti za FormData
+    'Content-Type': 'application/json', // Default header for JSON requests
   });
 
   constructor(private http: HttpClient) {}
 
+  // GET request with optional query params
   get(path: string, args?: any): Observable<any> {
     const options = {
       headers: this.headers,
       params: args ? this.serialize(args) : undefined,
     };
-
     return this.http
       .get(path, options)
       .pipe(catchError(this.checkError.bind(this)));
   }
 
+  // POST request with configurable headers
   post(path: string, body: any, customHeaders?: HttpHeaders): Observable<any> {
-    return this.request(path, body, RequestMethod.Post, customHeaders);
+    const headers = customHeaders
+      ? customHeaders
+      : this.setHeadersForBody(body);
+    return this.request(path, body, RequestMethod.Post, headers);
   }
 
-  put(path: string, body: any): Observable<any> {
-    return this.request(path, body, RequestMethod.Put);
+  // PUT request with configurable headers
+  put(path: string, body: any, customHeaders?: HttpHeaders): Observable<any> {
+    const headers = customHeaders
+      ? customHeaders
+      : this.setHeadersForBody(body);
+    return this.request(path, body, RequestMethod.Put, headers);
   }
 
-  delete(path: string, body?: any): Observable<any> {
-    return this.request(path, body, RequestMethod.Delete);
+  // DELETE request with optional body and headers
+  delete(
+    path: string,
+    body?: any,
+    customHeaders?: HttpHeaders
+  ): Observable<any> {
+    const headers = customHeaders ? customHeaders : this.headers;
+    return this.request(path, body, RequestMethod.Delete, headers);
   }
 
+  // General request method with custom headers
   private request(
     path: string,
     body: any,
     method = RequestMethod.Post,
     customHeaders?: HttpHeaders
   ): Observable<any> {
-    // Ako je body tipa FormData, uklanjamo Content-Type zaglavlje
-    const headers =
-      body instanceof FormData
-        ? customHeaders || new HttpHeaders({ Accept: 'application/json' })
-        : customHeaders || this.headers;
+    const req = new HttpRequest(method, path, body, {
+      headers: customHeaders,
+    });
 
-    const req = new HttpRequest(method, path, body, { headers });
-
-    return this.http
-      .request(req)
-      .pipe(filter((response) => response instanceof HttpResponse))
-      .pipe(map((response: HttpResponse<any>) => response.body))
-      .pipe(catchError((error) => this.checkError(error)));
+    return this.http.request(req).pipe(
+      filter((response) => response instanceof HttpResponse),
+      catchError((error) => this.checkError(error))
+    );
   }
 
-  private checkError(error: any): any {
-    throw error;
+  // Automatically set Content-Type based on body type (FormData or JSON)
+  private setHeadersForBody(body: any): HttpHeaders | undefined {
+    if (body instanceof FormData) {
+      return undefined; // Angular will set multipart/form-data headers automatically
+    }
+    return this.headers; // Use JSON headers
   }
 
+  // Serialize query parameters
   private serialize(obj: any): HttpParams {
     let params = new HttpParams();
-
     for (const key in obj) {
       if (obj.hasOwnProperty(key) && !this.looseInvalid(obj[key])) {
         params = params.set(key, obj[key]);
       }
     }
-
     return params;
   }
 
   private looseInvalid(a: string | number): boolean {
     return a === '' || a === null || a === undefined;
+  }
+
+  private checkError(error: any): any {
+    throw error;
   }
 }

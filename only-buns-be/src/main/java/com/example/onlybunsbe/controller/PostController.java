@@ -4,6 +4,8 @@ import com.example.onlybunsbe.DTO.CommentDTO;
 import com.example.onlybunsbe.DTO.PostDTO;
 import com.example.onlybunsbe.service.ImageService;
 import com.example.onlybunsbe.service.PostService;
+import com.example.onlybunsbe.util.TokenUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+    @Autowired
+    private TokenUtils tokenUtils;
 
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
@@ -68,8 +72,11 @@ public class PostController {
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<PostDTO> createPost(
             @RequestPart("post") PostDTO postDTO,
-            @RequestPart("image") MultipartFile image) {
+            @RequestPart("image") MultipartFile image, HttpServletRequest request) {
         try {
+
+            long userId = tokenUtils.getUserIdFromToken(tokenUtils.getToken(request));
+            postDTO.setUserId(userId);
             return postService.createPost(postDTO, image)
                     .map(createdPost -> ResponseEntity.status(HttpStatus.CREATED).body(createdPost))
                     .orElse(ResponseEntity.badRequest().build());

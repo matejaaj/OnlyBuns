@@ -29,3 +29,20 @@ button {
   padding: 10px;
   font-size: 16px;
 }
+
+.form-group.row {
+  display: flex;
+  gap: 1rem; /* Razmak između kolona */
+}
+
+.column {
+  flex: 1; /* Kolone će zauzeti jednak prostor */
+}
+
+.create-post-form .form-group {
+  margin-bottom: 1rem;
+}
+.map-container {
+  height: 400px;
+  width: 100%;
+}
