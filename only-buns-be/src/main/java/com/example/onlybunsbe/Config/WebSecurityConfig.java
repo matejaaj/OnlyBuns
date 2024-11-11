@@ -90,7 +90,8 @@ public class WebSecurityConfig {
                 "/swagger-ui/**",
                 "/api-docs/**",
                 "/swagger-resources/**",
-                "/webjars/**"
+                "/webjars/**",
+                "/uploads/**"
         );
     }
 }
