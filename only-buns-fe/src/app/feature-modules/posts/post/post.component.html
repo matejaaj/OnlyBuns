@@ -9,7 +9,7 @@
 
   <img
     *ngIf="post.image.path"
-    [src]="'http://localhost:8080' + post.image.path"
+    [src]="'http://localhost:8080/uploads/' + post.image.path"
     alt="Post Image"
     class="post-image"
   />
