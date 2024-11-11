@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Service
 public class ImageService {
-    private static final String IMAGE_DIRECTORY = "src/main/resources/static/uploads/";
+    private static final String IMAGE_DIRECTORY = "uploads/";
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 2MB u bajtovima
 
     public String saveImage(MultipartFile image) throws IOException {

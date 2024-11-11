@@ -151,4 +151,8 @@ fabric.properties
 # Local History for Visual Studio Code
 .history/
 
+# Ignore uploaded images in static folder
+src/main/resources/static/uploads/
+
+
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Vuejs,Eclipse,Intellij,VisualStudioCode

@@ -1,7 +1,9 @@
 <div class="create-post-form">
   <h2>Create a New Post</h2>
   <form (ngSubmit)="createPost()">
-    <div class="form-group">
+    <!-- Existing fields here -->
+
+    <div>
       <label for="description">Description:</label>
       <textarea
         id="description"
@@ -21,6 +23,71 @@
         accept="image/*"
         required
       />
+    </div>
+    <!-- Country and City fields -->
+    <div class="form-group row">
+      <div class="column">
+        <label for="country">Country:</label>
+        <input
+          type="text"
+          id="country"
+          [(ngModel)]="post.location.country"
+          name="country"
+          required
+          placeholder="Enter country"
+          (ngModelChange)="onAddressChange()"
+        />
+      </div>
+      <div class="column">
+        <label for="city">City:</label>
+        <input
+          type="text"
+          id="city"
+          [(ngModel)]="post.location.city"
+          name="city"
+          required
+          placeholder="Enter city"
+          (ngModelChange)="onAddressChange()"
+        />
+      </div>
+    </div>
+
+    <!-- Address and Number fields -->
+    <div class="form-group row">
+      <div class="column">
+        <label for="address">Address:</label>
+        <input
+          type="text"
+          id="address"
+          [(ngModel)]="post.location.address"
+          name="address"
+          required
+          placeholder="Enter address"
+          (ngModelChange)="onAddressChange()"
+        />
+      </div>
+      <div class="column">
+        <label for="number">Number:</label>
+        <input
+          type="number"
+          id="number"
+          [(ngModel)]="post.location.number"
+          name="number"
+          required
+          placeholder="Enter number"
+          (ngModelChange)="onAddressChange()"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="map">Izaberite lokaciju na mapi:</label>
+      <div
+        class="map-container"
+        leaflet
+        [leafletOptions]="options"
+        (leafletMapReady)="onMapReady($event)"
+      ></div>
     </div>
 
     <button type="submit" class="btn btn-primary">Create Post</button>
