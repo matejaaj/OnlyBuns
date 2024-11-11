@@ -59,7 +59,6 @@ public class UserController {
         return fooObj;
     }
 
-    // Endpoint za dobijanje svih korisnika sa opcijom sortiranja
     @GetMapping("/user/sort")
     public ResponseEntity<List<UserDTO>> getAllUsers(
             @RequestParam(value = "sortBy", defaultValue = "email") String sortBy,
@@ -69,8 +68,16 @@ public class UserController {
             @RequestParam(value = "minPosts", required = false) Integer minPosts,
             @RequestParam(value = "maxPosts", required = false) Integer maxPosts) {
 
-        System.out.print(name +" "+ email + " " + minPosts + " "  + maxPosts + " _____________________________________");
+        // Dodajemo logove za parametre
+        System.out.println("sortBy: " + sortBy);
+        System.out.println("isAscending: " + isAscending);
+        System.out.println("name: " + name);
+        System.out.println("email: " + email);
+        System.out.println("minPosts: " + minPosts);
+        System.out.println("maxPosts: " + maxPosts);
+
         List<UserDTO> users = userService.getAllUsers(name, email, minPosts, maxPosts, sortBy, isAscending);
         return ResponseEntity.ok(users);
     }
+
 }
