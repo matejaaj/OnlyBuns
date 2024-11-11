@@ -3,6 +3,7 @@ package com.example.onlybunsbe.service;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,6 +29,9 @@ public class UserService {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     // Pronalazi korisnika po korisničkom imenu
     public User findByUsername(String username) throws UsernameNotFoundException {
@@ -63,8 +67,20 @@ public class UserService {
         u.setAddress(userRequest.getAddress());
         Role role = roleService.findByName("ROLE_USER").orElseThrow(() -> new RuntimeException("Role 'ROLE_USER' not found"));
         u.setRole(role);
+        u.setEnabled(false);
 
-        return this.userRepository.save(u);
+        u.setActivationToken(UUID.randomUUID().toString());
+        User savedUser = userRepository.save(u);
+
+        String activationLink = "http://localhost:8080/auth/activate?token=" + u.getActivationToken();
+        emailSenderService.sendEmail(
+                u.getEmail(),
+                "Account Activation",
+                "Click the following link to activate your account: " + activationLink
+        );
+
+
+        return savedUser;
     }
     public List<UserDTO> getAllUsers(String name, String email, Integer minPosts, Integer maxPosts, String sortBy, boolean isAscending) {
         List<User> users = userRepository.findAll();
@@ -102,6 +118,17 @@ public class UserService {
 
         System.out.println("Filtered and sorted users: " + result.size());
         return result;
+    }
+
+    public boolean activateUser(String token) {
+        User user = userRepository.findByActivationToken(token);
+        if (user != null) {
+            user.setEnabled(true); // Enable the user's account
+            user.setActivationToken(null); // Clear the activation token after successful activation
+            userRepository.save(user); // Save the updated user record
+            return true;
+        }
+        return false; // Return false if the token was invalid or the user was not found
     }
 
 

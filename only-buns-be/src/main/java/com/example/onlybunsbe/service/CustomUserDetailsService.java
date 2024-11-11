@@ -4,6 +4,7 @@
     import com.example.onlybunsbe.model.User;
     import com.example.onlybunsbe.repository.UserRepository;
     import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.security.authentication.DisabledException;
     import org.springframework.security.core.userdetails.UserDetails;
     import org.springframework.security.core.userdetails.UserDetailsService;
     import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,15 +20,18 @@
         private UserRepository userRepository;
 
         @Override
-        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-            User user =  userRepository.findByEmail(email);
-            if(user == null){
-                  throw   new UsernameNotFoundException(String.format("No user found with email '%s'.", email));
+        public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
+            User user = userRepository.findByEmail(mail);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found with username: " + mail);
             }
-            else
-            {
-                return  user;
+
+            // Check if the user account is enabled (activated)
+            if (!user.isEnabled()) {
+                throw new DisabledException("User account is not activated. Please check your email for activation.");
             }
+
+            return user;
         }
 
     }

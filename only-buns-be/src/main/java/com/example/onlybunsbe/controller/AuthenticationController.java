@@ -17,10 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 
@@ -75,5 +72,15 @@ public class AuthenticationController {
         User user = this.userService.save(userRequest);
 
         return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+    // Activation endpoint
+    @GetMapping("/activate")
+    public ResponseEntity<String> activateUser(@RequestParam("token") String token) {
+        boolean isActivated = userService.activateUser(token);
+        if (isActivated) {
+            return ResponseEntity.ok("Account activated successfully. You can now log in.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid activation token.");
+        }
     }
 }
