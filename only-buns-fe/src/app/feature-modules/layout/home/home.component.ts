@@ -7,14 +7,22 @@ import { AuthService } from '../../../infrastructure/auth/auth.service';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  constructor(public authService: AuthService) {} // Koristimo public da bismo mogli koristiti authService direktno u HTML-u
+  viewMode: 'following' | 'nearby' | 'trending' | 'chat' = 'following';
+
+  constructor(public authService: AuthService) {}
+
   ngOnInit(): void {
     this.authService.checkIfAdmin().then((isAdmin) => {
       console.log('Is user admin?', isAdmin);
     });
   }
+
+  setViewMode(mode: 'following' | 'nearby' | 'trending'): void {
+    this.viewMode = mode;
+  }
+
   logout(): void {
-    console.log(this.authService.isAuthenticated() + '   AUTHENTICATED');
+    console.log(this.authService.isAuthenticated() + ' AUTHENTICATED');
     this.authService.logout();
   }
 }

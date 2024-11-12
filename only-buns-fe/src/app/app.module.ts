@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UserListComponent } from './feature-modules/users/user-list/user-list.component';
+import { NearbyPostsComponent } from './feature-modules/posts/nearby-posts/nearby-posts.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { UserListComponent } from './feature-modules/users/user-list/user-list.c
     MatProgressSpinnerModule, // Dodaj pravi modul za spinner
     BrowserAnimationsModule,
     FormsModule,
+    NearbyPostsComponent,
   ],
   providers: [
     {

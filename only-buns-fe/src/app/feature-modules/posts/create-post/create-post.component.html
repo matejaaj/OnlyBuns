@@ -23,7 +23,15 @@
         accept="image/*"
         required
       />
+      <!-- Image preview -->
+      <img
+        *ngIf="imagePreviewUrl"
+        [src]="imagePreviewUrl"
+        alt="Image Preview"
+        class="image-preview"
+      />
     </div>
+
     <!-- Country and City fields -->
     <div class="form-group row">
       <div class="column">
