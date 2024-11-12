@@ -7,6 +7,7 @@ import com.example.onlybunsbe.DTO.PostDTO;
 import com.example.onlybunsbe.model.Image;
 import com.example.onlybunsbe.model.Location;
 import com.example.onlybunsbe.model.Post;
+import com.example.onlybunsbe.model.User;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -21,18 +22,30 @@ public class PostMapper {
     public Post toPostEntity(PostDTO postDTO) {
         Post post = new Post();
         post.setDescription(postDTO.getDescription());
-        post.setCreatedAt(Instant.from(LocalDateTime.now())); // ili prema postDTO, ako je potrebno
+        post.setCreatedAt(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
+
 
         // Mapiranje ImageDTO na Image
         Image image = new Image();
         image.setPath(postDTO.getImage().getPath());
+        image.setCompressed(false);
+        image.setUploadedAt(LocalDateTime.now());
         post.setImage(image);
+
 
         // Mapiranje LocationDTO na Location
         Location location = new Location();
         location.setLatitude(postDTO.getLocation().getLatitude());
         location.setLongitude(postDTO.getLocation().getLongitude());
+        location.setCity(postDTO.getLocation().getCity());
+        location.setCountry(postDTO.getLocation().getCountry());
+        location.setNumber(postDTO.getLocation().getNumber());
+        location.setAddress(postDTO.getLocation().getAddress());
         post.setLocation(location);
+
+        User user = new User();
+        user.setId(postDTO.getUserId());
+        post.setUser(user);
 
         // Postavite dodatna polja po potrebi
         return post;
@@ -53,6 +66,10 @@ public class PostMapper {
         LocationDTO locationDTO = new LocationDTO();
         locationDTO.setLatitude(post.getLocation().getLatitude());
         locationDTO.setLongitude(post.getLocation().getLongitude());
+        locationDTO.setCity(post.getLocation().getCity());
+        locationDTO.setCountry(post.getLocation().getCountry());
+        locationDTO.setAddress(post.getLocation().getAddress());
+        locationDTO.setNumber(post.getLocation().getNumber());
         dto.setLocation(locationDTO);
 
         dto.setLikeCount(post.getLikes().size());
@@ -71,6 +88,7 @@ public class PostMapper {
             dto.setComments(commentDTOs);
         }
 
+        dto.setUserId(post.getUser().getId());
         return dto;
     }
 }

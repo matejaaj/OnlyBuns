@@ -6,15 +6,12 @@ import com.example.onlybunsbe.DTO.LocationDTO;
 import com.example.onlybunsbe.DTO.PostDTO;
 import com.example.onlybunsbe.model.Comment;
 import com.example.onlybunsbe.model.Like;
-import com.example.onlybunsbe.repository.CommentRepository;
-import com.example.onlybunsbe.repository.LikeRepository;
+import com.example.onlybunsbe.repository.*;
 import com.example.onlybunsbe.dtomappers.PostMapper;
 import com.example.onlybunsbe.model.Comment;
 import com.example.onlybunsbe.model.Image;
 import com.example.onlybunsbe.model.Like;
 import com.example.onlybunsbe.model.Post;
-import com.example.onlybunsbe.repository.PostRepository;
-import com.example.onlybunsbe.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +37,7 @@ public class PostService {
     private UserRepository userRepository;
     private LikeRepository likeRepository;
     private CommentRepository commentRepository;
+    private LocationRepository locationRepository;
     @Transactional
     public Optional<PostDTO> getPostById(Long id) {
         return postRepository.findById(id).map(postMapper::toPostDTO);
@@ -96,18 +94,22 @@ public class PostService {
 
     @Transactional
     public Optional<PostDTO> createPost(PostDTO postDTO, MultipartFile image) throws IOException {
+        // Create Image entity
         Image imageEntity = imageService.createImageEntity(image);
-
-
         postDTO.getImage().setPath(imageEntity.getPath());
 
-
-        // Kreiraj Post entitet
+        // Create Post entity from DTO
         Post post = postMapper.toPostEntity(postDTO);
-        post.setComments(new ArrayList<Comment>());
-        post.setLikes(new ArrayList<Like>());
+        post.setComments(new ArrayList<>());
+        post.setLikes(new ArrayList<>());
         post.setImage(imageEntity);
 
+        // Ensure Location is persisted before setting to Post (if Location is used)
+        if (post.getLocation() != null && post.getLocation().getId() == null) {
+            locationRepository.save(post.getLocation()); // Persist Location first if new
+        }
+
+        // Save Post
         Post savedPost = postRepository.save(post);
         return Optional.of(postMapper.toPostDTO(savedPost));
     }
