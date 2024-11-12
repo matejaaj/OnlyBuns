@@ -1,6 +1,8 @@
 package com.example.onlybunsbe.service;
 
 import com.example.onlybunsbe.DTO.CommentDTO;
+import com.example.onlybunsbe.DTO.ImageDTO;
+import com.example.onlybunsbe.DTO.LocationDTO;
 import com.example.onlybunsbe.DTO.PostDTO;
 import com.example.onlybunsbe.model.Comment;
 import com.example.onlybunsbe.model.Like;
@@ -45,9 +47,51 @@ public class PostService {
 
     @Transactional
     public List<PostDTO> getAllPosts() {
-        return postRepository.findAll().stream()
-                .map(postMapper::toPostDTO)
-                .collect(Collectors.toList());
+        return postRepository.findAll().stream().map(post -> {
+            PostDTO dto = new PostDTO();
+
+            // Post osnovni podaci
+            dto.setId(post.getId());
+            dto.setDescription(post.getDescription());
+            dto.setCreatedAt(post.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            dto.setUserId(post.getUser() != null ? post.getUser().getId() : null);
+            dto.setLikeCount(post.getLikes() != null ? post.getLikes().size() : 0);
+
+            // Mapiranje za ImageDTO
+            if (post.getImage() != null) {
+                ImageDTO imageDTO = new ImageDTO();
+                imageDTO.setId(post.getImage().getId());
+                imageDTO.setPath(post.getImage().getPath());
+                imageDTO.setCompressed(post.getImage().isCompressed());
+                imageDTO.setUploadedAt(post.getImage().getUploadedAt());
+                dto.setImage(imageDTO);
+            }
+
+            // Mapiranje za LocationDTO
+            if (post.getLocation() != null) {
+                LocationDTO locationDTO = new LocationDTO();
+                locationDTO.setId(post.getLocation().getId());
+                locationDTO.setCountry(post.getLocation().getCountry());
+                locationDTO.setCity(post.getLocation().getCity());
+                locationDTO.setAddress(post.getLocation().getAddress());
+                locationDTO.setNumber(post.getLocation().getNumber());
+                locationDTO.setLatitude(post.getLocation().getLatitude());
+                locationDTO.setLongitude(post.getLocation().getLongitude());
+                dto.setLocation(locationDTO);
+            }
+
+            // Mapiranje komentara u CommentDTO
+            dto.setComments(post.getComments() != null ? post.getComments().stream().map(comment -> {
+                CommentDTO commentDTO = new CommentDTO();
+                commentDTO.setId(comment.getId());
+                commentDTO.setContent(comment.getContent());
+                commentDTO.setCreatedAt(comment.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
+                commentDTO.setUserName(comment.getUser() != null ? comment.getUser().getUsername() : "");
+                return commentDTO;
+            }).collect(Collectors.toList()) : new ArrayList<>());
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Transactional
