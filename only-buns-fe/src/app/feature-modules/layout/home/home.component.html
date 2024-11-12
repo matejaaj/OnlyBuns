@@ -7,7 +7,12 @@
     My Profile
   </button>
 
+  <button *ngIf="authService.isAdmin()" routerLink="/users">
+    See Users
+    </button>
   <button *ngIf="!authService.isAuthenticated()" routerLink="/signup">
+    
+  
     Sign Up
   </button>
   <button *ngIf="!authService.isAuthenticated()" routerLink="/login">
