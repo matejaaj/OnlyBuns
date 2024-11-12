@@ -46,3 +46,12 @@ button {
   height: 400px;
   width: 100%;
 }
+
+.image-preview {
+  max-width: 100%;
+  max-height: 200px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  object-fit: cover;
+}

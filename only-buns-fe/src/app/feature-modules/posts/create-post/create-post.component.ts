@@ -6,12 +6,13 @@ import { FormsModule } from '@angular/forms';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { tileLayer, latLng, Map, Marker, marker, Icon } from 'leaflet';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-create-post',
   templateUrl: './create-post.component.html',
   standalone: true,
-  imports: [FormsModule, LeafletModule, HttpClientModule],
+  imports: [FormsModule, LeafletModule, HttpClientModule, CommonModule],
   styleUrls: ['./create-post.component.css'],
 })
 export class CreatePostComponent implements OnInit {
@@ -38,6 +39,7 @@ export class CreatePostComponent implements OnInit {
   options: any;
   map: Map | null = null;
   marker: Marker | null = null;
+  imagePreviewUrl: string | null = null;
 
   constructor(
     private postService: PostService,
@@ -164,6 +166,18 @@ export class CreatePostComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.selectedImage = input.files[0];
+
+      // Ensure the selected file is an image
+      if (this.selectedImage.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.imagePreviewUrl = e.target.result; // Set the preview URL to the base64 data URL
+        };
+        reader.readAsDataURL(this.selectedImage); // Read the file as a data URL
+      } else {
+        alert('Please upload a valid image file.');
+        this.selectedImage = null;
+      }
     }
   }
 
@@ -172,7 +186,7 @@ export class CreatePostComponent implements OnInit {
       this.postService.createPost(this.post, this.selectedImage).subscribe(
         (response) => {
           console.log('Post uspešno kreiran:', response);
-          this.router.navigate(['/posts']);
+          this.router.navigate(['/']);
         },
         (error) => {
           console.error('Greška pri kreiranju posta:', error);

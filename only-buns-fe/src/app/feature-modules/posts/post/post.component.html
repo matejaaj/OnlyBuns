@@ -1,4 +1,3 @@
-<h1>All Posts</h1>
 <div *ngFor="let post of posts">
   <h2 *ngIf="!post.isEditing">{{ post.description }}</h2>
   <input
@@ -6,7 +5,12 @@
     [(ngModel)]="post.newDescription"
     placeholder="Enter new description"
   />
-
+  <div *ngIf="isOwner(post.userId)">
+    <button *ngIf="!post.isEditing" (click)="enableEdit(post)">Edit</button>
+    <button *ngIf="post.isEditing" (click)="saveEdit(post)">Save</button>
+    <button *ngIf="post.isEditing" (click)="cancelEdit(post)">Cancel</button>
+    <button (click)="deletePost(post.id)">Delete</button>
+  </div>
   <img
     *ngIf="post.image.path"
     [src]="'http://localhost:8080' + post.image.path"
@@ -42,13 +46,6 @@
       <small>{{ comment.createdAt | date : "short" }}</small>
     </li>
   </ul>
-
-  <div *ngIf="isOwner(post.userId)">
-    <button *ngIf="!post.isEditing" (click)="enableEdit(post)">Edit</button>
-    <button *ngIf="post.isEditing" (click)="saveEdit(post)">Save</button>
-    <button *ngIf="post.isEditing" (click)="cancelEdit(post)">Cancel</button>
-    <button (click)="deletePost(post.id)">Delete</button>
-  </div>
 
   <hr />
 </div>
