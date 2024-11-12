@@ -42,11 +42,17 @@ export class LoginComponent {
 
     this.authService.login(loginData).subscribe({
       next: () => {
-        console.log(loginData);
-        this.router.navigate(['/']); // Navigacija na početnu stranu nakon uspešne prijave
+        this.router.navigate(['/']);
       },
       error: (err) => {
-        this.errorMessage = 'Login failed. Please check your credentials.';
+        // Check if error message is a plain text response
+        if (typeof err.error === 'string') {
+          this.errorMessage = err.error;  // Display plain text message directly
+        } else if (err.error?.error) {
+          this.errorMessage = err.error.error;  // Display JSON formatted error message if available
+        } else {
+          this.errorMessage = 'Login failed. Please check your credentials.';
+        }
         this.submitted = false;
       },
     });
