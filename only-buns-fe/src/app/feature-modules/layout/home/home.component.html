@@ -34,6 +34,12 @@
   >
 </div>
 
+<div class="center-buttons">
+  <button *ngIf="authService.isAuthenticated()" routerLink="/create-post">
+    Create Post
+  </button>
+</div>
+
 <!-- Conditional Display of Posts -->
 <div *ngIf="viewMode === 'following'">
   <!-- Component or logic to display posts from followed users -->
