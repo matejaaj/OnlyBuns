@@ -6,6 +6,9 @@
   <button *ngIf="authService.isAuthenticated()" routerLink="/profile">
     My Profile
   </button>
+  <button *ngIf="authService.isAdmin()" routerLink="/users">
+    See Users
+  </button>
 </div>
 
 <!-- Floating Chat Button -->
