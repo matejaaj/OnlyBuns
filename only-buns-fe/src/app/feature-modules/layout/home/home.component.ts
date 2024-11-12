@@ -11,8 +11,11 @@ export class HomeComponent implements OnInit {
 
   constructor(public authService: AuthService) {}
 
+  isAdmin: boolean = false;
+
   ngOnInit(): void {
     this.authService.checkIfAdmin().then((isAdmin) => {
+      this.isAdmin = isAdmin;
       console.log('Is user admin?', isAdmin);
     });
   }

@@ -6,8 +6,17 @@
   <button *ngIf="authService.isAuthenticated()" routerLink="/profile">
     My Profile
   </button>
+
   <button *ngIf="authService.isAdmin()" routerLink="/users">
     See Users
+    </button>
+  <button *ngIf="!authService.isAuthenticated()" routerLink="/signup">
+    
+  
+    Sign Up
+  </button>
+  <button *ngIf="!authService.isAuthenticated()" routerLink="/login">
+    Login
   </button>
 </div>
 
@@ -38,7 +47,14 @@
 </div>
 
 <div class="center-buttons">
-  <button *ngIf="authService.isAuthenticated()" routerLink="/create-post">
+  <button *ngIf="isAdmin" routerLink="/users">See users</button>
+</div>
+
+<div class="center-buttons">
+  <button
+    *ngIf="authService.isAuthenticated() && !isAdmin"
+    routerLink="/create-post"
+  >
     Create Post
   </button>
 </div>
