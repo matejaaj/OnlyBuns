@@ -1,9 +1,7 @@
 package com.example.onlybunsbe.service;
 
 import java.time.ZoneId;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -119,7 +117,6 @@ public class UserService {
         System.out.println("Filtered and sorted users: " + result.size());
         return result;
     }
-
     public boolean activateUser(String token) {
         User user = userRepository.findByActivationToken(token);
         if (user != null) {
@@ -129,6 +126,16 @@ public class UserService {
             return true;
         }
         return false; // Return false if the token was invalid or the user was not found
+    }
+
+    public List<User> getUsersInactiveForMoreThan7Days() {
+        int daysInactive = 7;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, -daysInactive);
+        Date thresholdDate = calendar.getTime();
+
+        return userRepository.findUsersWithLastLoginBefore(thresholdDate);
     }
 
 

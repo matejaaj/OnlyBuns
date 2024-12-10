@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -66,6 +67,9 @@ public class User implements UserDetails {
     @JsonIgnore
     @Column(name = "last_password_reset_date")
     private Timestamp lastPasswordResetDate;
+
+    @JsonIgnore
+    private Instant lastLoginDate;
 
     @JsonIgnore
     @Column(name = "activation_token")
