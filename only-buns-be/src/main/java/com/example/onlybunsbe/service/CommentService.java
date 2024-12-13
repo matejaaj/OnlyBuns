@@ -51,4 +51,8 @@ public class CommentService {
     public void removeCommentsByPost(Post post) {
         commentRepository.deleteByPost(post);
     }
+
+    public long getCommentCountAfterDate(Post post, Instant afterDate) {
+        return commentRepository.countCommentsAfterDate(post, afterDate);
+    }
 }
