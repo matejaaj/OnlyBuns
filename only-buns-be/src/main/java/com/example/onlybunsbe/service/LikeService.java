@@ -56,4 +56,8 @@ public class LikeService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public long getLikeCountAfterDate(Post post, Instant afterDate) {
+        return likeRepository.countLikesAfterDate(post, afterDate);
+    }
 }
