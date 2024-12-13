@@ -23,26 +23,26 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Optional<CommentDTO> addComment(Long postId, Long userId, String content) {
-        Optional<Post> post = postRepository.findById(postId);
-        Optional<User> user = userRepository.findById(userId);
+    public Optional<CommentDTO> addComment(CommentDTO commentDTO) {
+        Optional<Post> post = postRepository.findById(commentDTO.getPostId());
+        Optional<User> user = userRepository.findById(commentDTO.getUserId());
         System.out.print("Pronadjen post = " + post + " user = " + user);
         if (post.isPresent() && user.isPresent()) {
             Comment comment = new Comment();
             comment.setPost(post.get());
             comment.setUser(user.get());
-            comment.setContent(content);
+            comment.setContent(commentDTO.getContent());
             comment.setCreatedAt(Instant.now());
             commentRepository.save(comment);
 
             // Mapiranje komentara u CommentDTO
-            CommentDTO commentDTO = new CommentDTO();
-            commentDTO.setId((long) comment.getId());
-            commentDTO.setContent(content);
-            commentDTO.setCreatedAt(comment.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            commentDTO.setUserName(user.get().getUsername());
+            CommentDTO result = new CommentDTO();
+            result.setId((long) comment.getId());
+            result.setContent(commentDTO.getContent());
+            result.setCreatedAt(comment.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            result.setUserName(user.get().getUsername());
 
-            return Optional.of(commentDTO);
+            return Optional.of(result);
         }
         return Optional.empty();
     }

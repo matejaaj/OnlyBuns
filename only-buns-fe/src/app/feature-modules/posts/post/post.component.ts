@@ -46,7 +46,7 @@ export class PostComponent implements OnInit {
       this.updateIsLikedStatus(); // Ažuriraj `isLiked` kada su postovi učitani
     });
     console.log(this.posts);
-    console.log("******************")
+    console.log('******************');
   }
 
   loadLikes(): void {
@@ -72,15 +72,19 @@ export class PostComponent implements OnInit {
     if (typeof content !== 'string') return;
     const userId = this.getCurrentUserId();
     if (content.trim()) {
-      this.postService
-        .addComment(postId, userId, content)
-        .subscribe((comment: Comment) => {
-          const post = this.posts.find((p) => p.id === postId);
-          if (post) {
-            post.comments.push(comment);
-            post.newCommentContent = ''; // Reset polja za unos komentara
+      this.postService.addComment(postId, userId, content).subscribe(
+        (comment: Comment) => {
+          // Nakon uspešnog dodavanja komentara, ponovo učitaj postove
+          this.loadPosts();
+        },
+        (error) => {
+          if (error.status === 429) {
+            alert(
+              'You have exceeded the number of comments allowed. Only 5 comments are allowed per hour.'
+            );
           }
-        });
+        }
+      );
     }
   }
 
@@ -94,13 +98,13 @@ export class PostComponent implements OnInit {
   isOwner(userId: number): boolean {
     console.log(userId);
     console.log(userId === this.getCurrentUserId());
-    console.log( "OVO JE OWNER");
+    console.log('OVO JE OWNER');
     return userId === this.getCurrentUserId();
   }
 
   getCurrentUserId(): number {
     console.log(this.authService.getUserId());
-    console.log("OVO JE USERID");
+    console.log('OVO JE USERID');
     return this.authService.getUserId();
   }
 
