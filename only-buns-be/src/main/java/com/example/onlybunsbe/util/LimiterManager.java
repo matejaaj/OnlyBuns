@@ -15,7 +15,7 @@ public class LimiterManager {
     final RateLimiterConfig config = RateLimiterConfig.custom()
             .timeoutDuration(Duration.ofMillis(1000))
             .limitRefreshPeriod(Duration.ofHours(1))    // 1h period
-            .limitForPeriod(60)                         // 60 komentara po satu
+            .limitForPeriod(5)                         // 60 komentara po satu
             .build();
 
     public RateLimiter getLimiter(String apiKey) {

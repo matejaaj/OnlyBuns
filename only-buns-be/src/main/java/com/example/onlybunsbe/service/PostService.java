@@ -45,7 +45,7 @@ public class PostService {
 
     @Transactional
     public List<PostDTO> getAllPosts() {
-        return postRepository.findAll().stream().map(post -> {
+        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(post -> {
             PostDTO dto = new PostDTO();
 
             // Post osnovni podaci
@@ -79,14 +79,16 @@ public class PostService {
             }
 
             // Mapiranje komentara u CommentDTO
-            dto.setComments(post.getComments() != null ? post.getComments().stream().map(comment -> {
-                CommentDTO commentDTO = new CommentDTO();
-                commentDTO.setId(comment.getId());
-                commentDTO.setContent(comment.getContent());
-                commentDTO.setCreatedAt(comment.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
-                commentDTO.setUserName(comment.getUser() != null ? comment.getUser().getUsername() : "");
-                return commentDTO;
-            }).collect(Collectors.toList()) : new ArrayList<>());
+            dto.setComments(post.getComments() != null ? post.getComments().stream()
+                    .sorted((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt())) // Sortiraj najnovije komentare prvo
+                    .map(comment -> {
+                        CommentDTO commentDTO = new CommentDTO();
+                        commentDTO.setId(comment.getId());
+                        commentDTO.setContent(comment.getContent());
+                        commentDTO.setCreatedAt(comment.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
+                        commentDTO.setUserName(comment.getUser() != null ? comment.getUser().getUsername() : "");
+                        return commentDTO;
+                    }).collect(Collectors.toList()) : new ArrayList<>());
 
             return dto;
         }).collect(Collectors.toList());
