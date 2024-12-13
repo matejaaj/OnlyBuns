@@ -1,6 +1,8 @@
 package com.example.onlybunsbe.service;
 
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -131,12 +133,13 @@ public class UserService {
     public List<User> getUsersInactiveForMoreThan7Days() {
         int daysInactive = 7;
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, -daysInactive);
-        Date thresholdDate = calendar.getTime();
+        // Koristite Instant za precizan rad sa vremenom
+        Instant thresholdInstant = Instant.now().minus(daysInactive, ChronoUnit.DAYS);
 
-        return userRepository.findUsersWithLastLoginBefore(thresholdDate);
+        // Metoda u UserRepository treba da koristi Instant
+        return userRepository.findUsersWithLastLoginBefore(thresholdInstant);
     }
+
 
 
     private UserDTO convertToDTO(User user) {
