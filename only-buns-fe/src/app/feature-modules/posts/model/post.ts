@@ -11,4 +11,5 @@ export interface Post {
   location: Location;
   likeCount: number;
   comments: Comment[];
+  cachedImagePath?: string;
 }
