@@ -1,0 +1,31 @@
+<div class="analytics-container">
+  <h1>Application Analytics</h1>
+
+  <!-- Sekcija za broj objava i komentara -->
+  <div class="stats-section">
+    <h2>Posts and Comments</h2>
+    <div class="timeframe-stats">
+      <div class="stat-box">
+        <h3>Weekly</h3>
+        <p>Posts: {{ weeklyPosts }}</p>
+        <p>Comments: {{ weeklyComments }}</p>
+      </div>
+      <div class="stat-box">
+        <h3>Monthly</h3>
+        <p>Posts: {{ monthlyPosts }}</p>
+        <p>Comments: {{ monthlyComments }}</p>
+      </div>
+      <div class="stat-box">
+        <h3>Yearly</h3>
+        <p>Posts: {{ yearlyPosts }}</p>
+        <p>Comments: {{ yearlyComments }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sekcija za radijalni grafikon -->
+  <div class="radial-chart-section">
+    <h2>User Activity</h2>
+    <canvas id="radialChart"></canvas>
+  </div>
+</div>

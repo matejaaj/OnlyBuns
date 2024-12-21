@@ -18,5 +18,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.posts WHERE u.lastLoginDate < :cutoffDate")
     List<User> findUsersWithLastLoginBefore(@Param("cutoffDate") Instant cutoffDate);
 
+    @Query("SELECT COUNT(u) FROM User u WHERE SIZE(u.posts) > 0")
+    long countByPostsIsNotEmpty();
 
+    @Query("SELECT COUNT(DISTINCT c.user.id) " +
+            "FROM Comment c " +
+            "WHERE c.user.id NOT IN (SELECT p.user.id FROM Post p)")
+    long countWithOnlyComments();
 }

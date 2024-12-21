@@ -22,6 +22,7 @@
     "@angular/router": "^18.2.0",
     "@asymmetrik/ngx-leaflet": "^18.0.1",
     "@types/leaflet": "^1.9.14",
+    "chart.js": "^4.4.7",
     "leaflet": "^1.9.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

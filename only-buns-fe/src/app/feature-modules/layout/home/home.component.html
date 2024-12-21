@@ -6,13 +6,19 @@
   <button *ngIf="authService.isAuthenticated()" routerLink="/profile">
     My Profile
   </button>
-
+  <button *ngIf="authService.isAuthenticated() && authService.isAdmin()" routerLink="/posts">
+    All Users' Posts
+  </button>
+  <button *ngIf="authService.isAuthenticated() && authService.isAdmin()" routerLink="/trends">
+    View Trends
+  </button>
+  <button *ngIf="authService.isAuthenticated() && authService.isAdmin()" routerLink="/analytics">
+    Application Analytics
+  </button>
   <button *ngIf="authService.isAdmin()" routerLink="/users">
     See Users
     </button>
   <button *ngIf="!authService.isAuthenticated()" routerLink="/signup">
-    
-  
     Sign Up
   </button>
   <button *ngIf="!authService.isAuthenticated()" routerLink="/login">

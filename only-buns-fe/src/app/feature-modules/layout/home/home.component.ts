@@ -16,7 +16,6 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.authService.checkIfAdmin().then((isAdmin) => {
       this.isAdmin = isAdmin;
-      console.log('Is user admin?', isAdmin);
     });
   }
 
@@ -25,7 +24,6 @@ export class HomeComponent implements OnInit {
   }
 
   logout(): void {
-    console.log(this.authService.isAuthenticated() + ' AUTHENTICATED');
     this.authService.logout();
   }
 }

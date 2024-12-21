@@ -17,6 +17,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UserListComponent } from './feature-modules/users/user-list/user-list.component';
 import { NearbyPostsComponent } from './feature-modules/posts/nearby-posts/nearby-posts.component';
+import {TrendsComponent} from './feature-modules/trends/trends.component';
+import {AnalyticsComponent} from './feature-modules/analytics/analytics.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +42,8 @@ import { NearbyPostsComponent } from './feature-modules/posts/nearby-posts/nearb
     BrowserAnimationsModule,
     FormsModule,
     NearbyPostsComponent,
+    TrendsComponent,
+    AnalyticsComponent,
   ],
   providers: [
     {

@@ -144,7 +144,7 @@ public class UserService {
     @Scheduled(cron = "0 59 23 L * ?") // "L" označava poslednji dan u mesecu
     public void deleteUnactivatedAccounts() {
         List<User> unactivatedUsers = userRepository.findAll().stream()
-                .filter(user -> !user.isEnabled() && user.getActivationToken() != null)
+                .filter(user -> !user.isEnabled())
                 .collect(Collectors.toList());
 
         if (!unactivatedUsers.isEmpty()) {
