@@ -8,6 +8,8 @@ import { LoginComponent } from '../auth/login/login.component';
 import { CreatePostComponent } from '../../feature-modules/posts/create-post/create-post.component';
 import { UserProfileComponent } from '../../feature-modules/users/user-profile/user-profile.component';
 import { ChatComponent } from '../../feature-modules/chat/chat/chat.component';
+import {TrendsComponent} from '../../feature-modules/trends/trends.component';
+import {AnalyticsComponent} from '../../feature-modules/analytics/analytics.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -18,4 +20,6 @@ export const routes: Routes = [
   { path: 'create-post', component: CreatePostComponent },
   { path: 'profile', component: UserProfileComponent },
   { path: 'chat', component: ChatComponent },
+  { path: 'trends', component: TrendsComponent},
+  { path: 'analytics', component: AnalyticsComponent},
 ];

@@ -4,6 +4,8 @@ import { Post as Post } from '../posts/model/post';
 import { Comment } from '../posts/model/comment';
 import { ApiService } from '../../infrastructure/api.service';
 import { Like } from '../posts/model/like';
+import {HttpClient} from '@angular/common/http';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -13,15 +15,15 @@ export class PostService {
   private likeApiUrl = 'http://localhost:8080/api/likes';
   private commentApiUrl = 'http://localhost:8080/api/comments';
 
-  constructor(private apiService: ApiService) {}
+  private imageCache = new Map<string, string>();
+
+  constructor(private apiService: ApiService, private http: HttpClient) {}
 
   getAllPosts(): Observable<Post[]> {
-    console.log('salje se zahtev');
     return this.apiService.get(this.postApiUrl);
   }
 
   likePost(postId: number, userId: number): Observable<void> {
-    console.log(postId, userId);
     return this.apiService.post(
       `${this.likeApiUrl}/${postId}?userId=${userId}`,
       {}
@@ -33,7 +35,6 @@ export class PostService {
     userId: number,
     content: string
   ): Observable<Comment> {
-    console.log(postId + ' userid ' + userId + ' content ' + content);
     return this.apiService.post(
       `${this.commentApiUrl}/${postId}?userId=${userId}`,
       JSON.stringify({ content })
@@ -54,7 +55,6 @@ export class PostService {
   }
 
   getLikes(): Observable<Like[]> {
-    console.log('DOBAVLJAM SVE LAJKOVE');
     return this.apiService.get(this.likeApiUrl);
   }
 
@@ -73,5 +73,29 @@ export class PostService {
     // Pozivamo ApiService bez postavljanja Content-Type zaglavlja, jer će
     // Angular automatski postaviti "multipart/form-data" kada koristi FormData
     return this.apiService.post(this.postApiUrl, formData);
+  }
+
+  getCachedImage(imagePath: string): Observable<string> {
+    const cachedImage = this.imageCache.get(imagePath);
+    if (cachedImage) {
+      // Ako je slika u kešu, vraćamo je kao Observable
+      return new Observable((observer) => {
+        observer.next(cachedImage);
+        observer.complete();
+      });
+    }
+
+    // Ako nije u kešu, preuzimamo je sa servera
+    return this.http
+      .get(`http://localhost:8080/uploads/${imagePath}`, {
+        responseType: 'blob',
+      })
+      .pipe(
+        map((blob) => {
+          const objectUrl = URL.createObjectURL(blob); // Kreiranje URL-a za blob
+          this.imageCache.set(imagePath, objectUrl); // Keširanje slike
+          return objectUrl;
+        })
+      );
   }
 }

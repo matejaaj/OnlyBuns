@@ -34,7 +34,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let user of users">
+  <tr *ngFor="let user of filteredUsers">
     <td>{{ user.firstName }} {{ user.lastName }}</td>
     <td>{{ user.email }}</td>
     <td>{{ user.role }}</td>
@@ -44,3 +44,8 @@
   </tr>
   </tbody>
 </table>
+<div *ngIf="totalPages > 1" class="pagination">
+  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+  <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+</div>

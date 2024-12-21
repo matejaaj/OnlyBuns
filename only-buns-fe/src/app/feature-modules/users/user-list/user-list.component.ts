@@ -18,6 +18,11 @@ export class UserListComponent implements OnInit {
   minPosts: number | null = null;
   maxPosts: number | null = null;
 
+  filteredUsers: User[] = [];
+  currentPage = 1;
+  pageSize = 5;
+  totalPages = 1;
+
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
@@ -45,7 +50,7 @@ export class UserListComponent implements OnInit {
       })
       .subscribe((data: User[]) => {
         this.users = data;
-        console.log('Filtered users:', this.users);
+        this.updateFilteredUsers();
       });
   }
 
@@ -60,6 +65,26 @@ export class UserListComponent implements OnInit {
   }
 
   onSearch(): void {
+    this.currentPage = 1;
     this.loadUsers();
+  }
+
+  updateFilteredUsers(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+
+    // Ažuriramo korisnike na osnovu trenutne stranice
+    this.filteredUsers = this.users.slice(startIndex, endIndex);
+
+    // Računamo ukupan broj stranica
+    this.totalPages = Math.ceil(this.users.length / this.pageSize);
+  }
+
+  changePage(newPage: number): void {
+    if (newPage < 1 || newPage > this.totalPages) {
+      return;
+    }
+    this.currentPage = newPage;
+    this.updateFilteredUsers();
   }
 }

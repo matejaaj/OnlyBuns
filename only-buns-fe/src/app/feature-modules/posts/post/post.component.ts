@@ -43,15 +43,21 @@ export class PostComponent implements OnInit {
         isEditing: false,
         newDescription: '',
       }));
+
+      this.posts.forEach((post) => {
+        if (post.image && post.image.path) {
+          this.postService.getCachedImage(post.image.path).subscribe((url) => {
+            post.cachedImagePath = url; // Čuvamo keširani URL slike
+          });
+        }
+      });
+
       this.updateIsLikedStatus(); // Ažuriraj `isLiked` kada su postovi učitani
     });
-    console.log(this.posts);
-    console.log('******************');
   }
 
   loadLikes(): void {
     this.postService.getLikes().subscribe((likes) => {
-      console.log('DOBAVLJAM SVE LAJKOVE');
       this.userLikes = likes;
       this.loadPosts(); // Učitaj postove tek nakon što imamo sve lajkove
     });
@@ -96,15 +102,10 @@ export class PostComponent implements OnInit {
   }
 
   isOwner(userId: number): boolean {
-    console.log(userId);
-    console.log(userId === this.getCurrentUserId());
-    console.log('OVO JE OWNER');
     return userId === this.getCurrentUserId();
   }
 
   getCurrentUserId(): number {
-    console.log(this.authService.getUserId());
-    console.log('OVO JE USERID');
     return this.authService.getUserId();
   }
 
