@@ -13,6 +13,7 @@ import com.example.onlybunsbe.model.Role;
 import com.example.onlybunsbe.model.User;
 import com.example.onlybunsbe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -140,7 +141,19 @@ public class UserService {
         return userRepository.findUsersWithLastLoginBefore(thresholdInstant);
     }
 
+    @Scheduled(cron = "0 59 23 L * ?") // "L" označava poslednji dan u mesecu
+    public void deleteUnactivatedAccounts() {
+        List<User> unactivatedUsers = userRepository.findAll().stream()
+                .filter(user -> !user.isEnabled() && user.getActivationToken() != null)
+                .collect(Collectors.toList());
 
+        if (!unactivatedUsers.isEmpty()) {
+            userRepository.deleteAll(unactivatedUsers);
+            System.out.println("Deleted unactivated accounts: " + unactivatedUsers.size());
+        } else {
+            System.out.println("No unactivated accounts found for deletion.");
+        }
+    }
 
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
