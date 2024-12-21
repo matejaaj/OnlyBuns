@@ -64,16 +64,14 @@ export class PostComponent implements OnInit {
   }
 
   likePost(postId: number): void {
-    const userId = this.getCurrentUserId();
-    this.postService.likePost(postId, userId).subscribe(() => {
+    this.postService.likePost(postId).subscribe((updatedPost) => {
       const post = this.posts.find((p) => p.id === postId);
-      if (post && !post.isLiked) {
-        post.isLiked = true;
-        post.likeCount += 1;
+      if (post) {
+        post.isLiked = true; // Ažuriramo status lajka
+        post.likeCount = updatedPost.likeCount; // Ažuriramo broj lajkova iz odgovora
       }
     });
   }
-
   addComment(postId: number, content?: string): void {
     if (typeof content !== 'string') return;
     const userId = this.getCurrentUserId();

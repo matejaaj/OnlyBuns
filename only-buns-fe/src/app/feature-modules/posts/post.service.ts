@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Post as Post } from '../posts/model/post';
+import { Post } from '../posts/model/post';
 import { Comment } from '../posts/model/comment';
 import { ApiService } from '../../infrastructure/api.service';
 import { Like } from '../posts/model/like';
-import {HttpClient} from '@angular/common/http';
-import {map} from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -23,11 +23,18 @@ export class PostService {
     return this.apiService.get(this.postApiUrl);
   }
 
-  likePost(postId: number, userId: number): Observable<void> {
-    return this.apiService.post(
-      `${this.likeApiUrl}/${postId}?userId=${userId}`,
-      {}
-    );
+  likePost(postId: number): Observable<Post> {
+    return this.apiService
+      .postWithResponse<Post>(`${this.likeApiUrl}/${postId}`, null)
+      .pipe(
+        map((response) => {
+          const post = response.body; // Ekstrakcija tela odgovora
+          if (!post) {
+            throw new Error('Invalid response: Post data not found');
+          }
+          return post; // Vraćamo ažurirani post objekat
+        })
+      );
   }
 
   addComment(
