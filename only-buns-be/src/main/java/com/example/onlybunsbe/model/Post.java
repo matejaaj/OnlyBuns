@@ -49,4 +49,23 @@ public class Post {
     @ManyToOne
     @JoinColumn(name="location_id")
     private Location location;
+
+    @NotNull
+    @Column(name = "like_count", nullable = false)
+    @ColumnDefault("0")
+    private Integer likeCount = 0;
+
+    // Verzija za optimističko zaključavanje
+    @Version
+    @Column(name = "version", nullable = false)
+    private Integer version;
+
+    public void addLike(Like like) {
+        if (likes == null) {
+            likes = new ArrayList<>();
+        }
+        likes.add(like); // Dodajemo lajk u kolekciju
+        like.setPost(this); // Postavljamo referencu na trenutni post
+        likeCount = (likeCount == null ? 0 : likeCount) + 1; // Ažuriramo broj lajkova
+    }
 }
