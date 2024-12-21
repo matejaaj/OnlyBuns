@@ -49,6 +49,20 @@ export class ApiService {
     return this.request(path, body, RequestMethod.Post, headers);
   }
 
+  postWithResponse<T>(
+    path: string,
+    body: any,
+    customHeaders?: HttpHeaders
+  ): Observable<HttpResponse<T>> {
+    const headers = customHeaders
+      ? customHeaders
+      : this.setHeadersForBody(body);
+    return this.http.post<T>(path, body, {
+      headers: headers,
+      observe: 'response', // Omogućava vraćanje celog HttpResponse objekta
+    });
+  }
+
   // PUT request with configurable headers
   put(path: string, body: any, customHeaders?: HttpHeaders): Observable<any> {
     const headers = customHeaders
