@@ -4,6 +4,7 @@ import com.example.onlybunsbe.DTO.CommentDTO;
 import com.example.onlybunsbe.DTO.ImageDTO;
 import com.example.onlybunsbe.DTO.LocationDTO;
 import com.example.onlybunsbe.DTO.PostDTO;
+import com.example.onlybunsbe.infrastructure.messaging.RabbitMQPublisher;
 import com.example.onlybunsbe.model.Comment;
 import com.example.onlybunsbe.model.Like;
 import com.example.onlybunsbe.repository.*;
@@ -38,6 +39,7 @@ public class PostService {
     private LikeRepository likeRepository;
     private CommentRepository commentRepository;
     private LocationRepository locationRepository;
+    private final RabbitMQPublisher rabbitMQPublisher; // Dodato
     @Transactional
     public Optional<PostDTO> getPostById(Long id) {
         return postRepository.findById(id).map(postMapper::toPostDTO);
@@ -152,6 +154,11 @@ public class PostService {
         post.setEligibleForAd(true);
         Post updatedPost = postRepository.save(post);
 
+        rabbitMQPublisher.sendPostMessage(
+                post.getDescription(),
+                post.getUser().getUsername(),
+                post.getCreatedAt().toString()
+        );
 
         return postMapper.toPostDTO(updatedPost);
     }
