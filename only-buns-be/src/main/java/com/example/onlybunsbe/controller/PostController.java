@@ -87,4 +87,11 @@ public class PostController {
         }
     }
 
+    @PutMapping("/ad-eligibility/{postId}")
+    public ResponseEntity<PostDTO> markPostAsEligibleForAd(@PathVariable Long postId) {
+        PostDTO updatedPost = postService.markPostAsEligible(postId);
+        return ResponseEntity.ok(updatedPost); // Vraćamo ažurirani PostDTO
+    }
+
+
 }

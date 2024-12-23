@@ -13,7 +13,9 @@
   </div>
   <img
     *ngIf="post.image.path"
-    [src]="post.cachedImagePath || ('http://localhost:8080/uploads/' + post.image.path)"
+    [src]="
+      post.cachedImagePath || 'http://localhost:8080/uploads/' + post.image.path
+    "
     alt="Post Image"
     class="post-image"
   />
@@ -27,6 +29,20 @@
     Like
   </button>
   <button *ngIf="post.isLiked" disabled>Liked</button>
+
+  <div *ngIf="post.eligibleForAd">
+    <p class="ad-status">Marked as eligible for ads</p>
+  </div>
+  <div *ngIf="!post.eligibleForAd && authService.isAdmin()">
+    <label>
+      <input
+        type="checkbox"
+        [checked]="post.eligibleForAd"
+        (change)="onCheckboxToggle(post)"
+      />
+      Mark eligible for ad
+    </label>
+  </div>
 
   <div *ngIf="authService.isAuthenticated()">
     <input
