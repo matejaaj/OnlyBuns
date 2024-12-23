@@ -105,4 +105,16 @@ export class PostService {
         })
       );
   }
+
+  updateAdEligibility(postId: number): Observable<Post> {
+    return this.apiService
+      .put(`${this.postApiUrl}/ad-eligibility/${postId}`, {})
+      .pipe(
+        map((response: any) => {
+          // Pretpostavka da API vraća ažurirani post
+          const updatedPost: Post = response;
+          return updatedPost; // Osiguravamo da Observable vrati ažurirani post
+        })
+      );
+  }
 }

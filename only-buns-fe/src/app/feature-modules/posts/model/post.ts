@@ -12,4 +12,5 @@ export interface Post {
   likeCount: number;
   comments: Comment[];
   cachedImagePath?: string;
+  eligibleForAd: boolean;
 }

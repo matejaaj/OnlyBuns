@@ -65,6 +65,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/posts/ad-eligibility/**").hasRole("ADMIN")
                         .requestMatchers("/api/posts/**").permitAll()
                         .requestMatchers("api/user/**").authenticated()
                         .requestMatchers("/api/likes/**").authenticated()// `ROLE_USER` će se automatski prepoznati

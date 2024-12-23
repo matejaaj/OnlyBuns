@@ -63,6 +63,12 @@ public class Post {
     @Column(name = "version", nullable = false)
     private Integer version;
 
+    @NotNull
+    @Column(name = "eligible_for_ad", nullable = false)
+    @ColumnDefault("false")
+    private Boolean eligibleForAd = false;
+
+
     public void addLike(Like like) {
         if (likes == null) {
             likes = new ArrayList<>();

@@ -32,6 +32,7 @@ export class CreatePostComponent implements OnInit {
     },
     likeCount: 0,
     comments: [],
+    eligibleForAd: false,
   };
   selectedImage: File | null = null;
 
