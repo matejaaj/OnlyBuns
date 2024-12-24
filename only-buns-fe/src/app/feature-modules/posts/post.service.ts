@@ -77,9 +77,9 @@ export class PostService {
     // Dodaj sliku
     formData.append('image', image);
 
-    // Pozivamo ApiService bez postavljanja Content-Type zaglavlja, jer će
-    // Angular automatski postaviti "multipart/form-data" kada koristi FormData
-    return this.apiService.post(this.postApiUrl, formData);
+    const createUrl = `${this.postApiUrl}/create`;
+
+    return this.apiService.post(createUrl, formData);
   }
 
   getCachedImage(imagePath: string): Observable<string> {
