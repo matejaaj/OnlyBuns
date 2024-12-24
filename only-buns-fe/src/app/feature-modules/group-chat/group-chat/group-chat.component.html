@@ -1,0 +1,10 @@
+<div class="group-chat-container">
+  <input [(ngModel)]="groupName" placeholder="Group Name" />
+  <button (click)="createGroup()">Create Group</button>
+
+  <div *ngFor="let group of groups">
+    <h3>{{ group.name }}</h3>
+    <button (click)="addMember(group.id, 2)">Add Member</button>
+    <button (click)="removeMember(group.id, 2)">Remove Member</button>
+  </div>
+</div>

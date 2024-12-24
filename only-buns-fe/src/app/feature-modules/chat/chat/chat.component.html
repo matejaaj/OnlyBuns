@@ -1,1 +1,25 @@
-<p>chat works!</p>
+<div class="chat-container">
+  <div class="messages">
+    <div *ngFor="let message of messages">
+      <div class="message">
+        <strong>{{ message.senderId }}</strong>: {{ message.content }}
+        <span class="timestamp">{{ message.createdAt | date: 'shortTime' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <input [(ngModel)]="message" placeholder="Type a message..." />
+  <button (click)="sendMessage()">Send</button>
+
+  <div class="create-group">
+    <button (click)="openCreateGroupModal()">Create Group Chat</button>
+  </div>
+
+  <!-- Modal za kreiranje grupnog četa -->
+  <div *ngIf="showCreateGroupModal" class="modal">
+    <h2>Create Group Chat</h2>
+    <input [(ngModel)]="newGroupName" placeholder="Group Name" />
+    <button (click)="createGroup()">Create</button>
+    <button (click)="closeCreateGroupModal()">Cancel</button>
+  </div>
+</div>

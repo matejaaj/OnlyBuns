@@ -18,6 +18,8 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost:4200"); // Dozvoljava origin za Angular frontend
         config.addAllowedHeader("*"); // Dozvoljava sve zaglavlja
         config.addAllowedMethod("*"); // Dozvoljava sve HTTP metode (GET, POST, itd.)
+        config.addAllowedHeader("Authorization"); // JWT token zaglavlje
+        config.addExposedHeader("Authorization"); // Ako treba da bude vidljivo
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);

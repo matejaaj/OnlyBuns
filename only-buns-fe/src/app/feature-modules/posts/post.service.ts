@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Post as Post } from '../posts/model/post';
-import { Comment } from '../posts/model/comment';
+import { Comment } from './model/comment';
 import { ApiService } from '../../infrastructure/api.service';
-import { Like } from '../posts/model/like';
+import { Like } from './model/like';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 

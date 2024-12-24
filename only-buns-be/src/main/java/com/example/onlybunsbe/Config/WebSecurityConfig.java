@@ -73,6 +73,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/foo").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/api/analytics/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/api/groups/**").authenticated()
+                        .requestMatchers("/api/chat/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

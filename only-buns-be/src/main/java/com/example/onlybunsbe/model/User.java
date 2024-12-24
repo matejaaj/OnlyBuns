@@ -122,4 +122,13 @@ public class User implements UserDetails {
         this.password = password;
         this.lastPasswordResetDate = new Timestamp(new Date().getTime());
     }
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<ChatMessage> sentMessages; // Poruke koje je korisnik poslao
+
+    @ManyToMany(mappedBy = "members")
+    @JsonIgnore
+    private Set<GroupChat> groupChats; // Grupe u kojima je korisnik član
+
 }
