@@ -102,7 +102,8 @@ public class WebSecurityConfig {
                 "/api-docs/**",
                 "/swagger-resources/**",
                 "/webjars/**",
-                "/uploads/**"
+                "/uploads/**",
+                "/actuator/prometheus"
         );
     }
 }
