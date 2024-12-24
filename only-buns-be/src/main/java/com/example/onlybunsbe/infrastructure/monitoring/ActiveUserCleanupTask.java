@@ -15,7 +15,7 @@ public class ActiveUserCleanupTask {
 
     @Scheduled(fixedRate = 60000) // 60 sekundi
     public void cleanupInactiveUsers() {
-        long inactivityThresholdMillis = 15 * 60 * 1000; // 15 minuta
+        long inactivityThresholdMillis = 24 * 60 * 60 * 1000; // 24 sata
         activeUserTracker.removeInactiveUsers(inactivityThresholdMillis);
     }
 }
