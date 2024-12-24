@@ -169,5 +169,12 @@ public class UserService {
         dto.setFollowerCount(user.getFollowers() != null ? user.getFollowers().size() : 0);
         return dto;
     }
+
+    public void updateLastLogin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+        user.setLastLoginDate(Instant.now());
+        userRepository.save(user);
+    }
 }
 

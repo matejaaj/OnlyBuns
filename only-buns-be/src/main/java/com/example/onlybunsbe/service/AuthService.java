@@ -62,7 +62,7 @@ public class AuthService {
             String jwt = tokenUtils.generateToken(user.getEmail(), user.getId(), user.getRole().getName());
             int expiresIn = tokenUtils.getExpiredIn();
 
-
+            userService.updateLastLogin(user.getId());
 
             return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, user.getId()));
 
