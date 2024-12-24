@@ -33,6 +33,8 @@ public class AuthService {
     @Autowired
     private AttemptService attemptService;
 
+
+
     public ResponseEntity<?> login(JwtAuthenticationRequest authenticationRequest, HttpServletRequest request) {
         String ipAddress = request.getRemoteAddr();
 
@@ -59,6 +61,8 @@ public class AuthService {
             User user = (User) authentication.getPrincipal();
             String jwt = tokenUtils.generateToken(user.getEmail(), user.getId(), user.getRole().getName());
             int expiresIn = tokenUtils.getExpiredIn();
+
+
 
             return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, user.getId()));
 

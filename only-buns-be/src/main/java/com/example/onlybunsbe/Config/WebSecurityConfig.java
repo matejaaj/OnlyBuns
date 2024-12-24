@@ -1,5 +1,7 @@
 package com.example.onlybunsbe.Config;
 
+import com.example.onlybunsbe.infrastructure.monitoring.ActiveUserFilter;
+import com.example.onlybunsbe.infrastructure.monitoring.ActiveUserTracker;
 import com.example.onlybunsbe.security.auth.RestAuthenticationEntryPoint;
 import com.example.onlybunsbe.security.auth.TokenAuthenticationFilter;
 import com.example.onlybunsbe.service.CustomUserDetailsService;
@@ -34,6 +36,9 @@ public class WebSecurityConfig {
 
     @Autowired
     private TokenUtils tokenUtils;
+
+    @Autowired
+    private ActiveUserTracker activeUserTracker;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -81,8 +86,9 @@ public class WebSecurityConfig {
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
-                .addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userDetailsService()),
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userDetailsService()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new ActiveUserFilter(activeUserTracker), TokenAuthenticationFilter.class);
+
 
         http.authenticationProvider(authenticationProvider());
 
