@@ -64,6 +64,9 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(restAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/favicon.ico").permitAll()
+                        .requestMatchers("/error").permitAll() // Dozvoljava pristup error handler-u
+                        .requestMatchers("/actuator/prometheus").permitAll() // Dozvoljava pristup bez autentikacije
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/posts/ad-eligibility/**").hasRole("ADMIN")
                         .requestMatchers("/api/posts/**").permitAll()
