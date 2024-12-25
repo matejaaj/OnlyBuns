@@ -27,13 +27,8 @@ public class GroupChat {
     @JoinColumn(name = "admin_id", nullable = false)
     private User admin; // Korisnik koji je admin grupe
 
-    @ManyToMany
-    @JoinTable(
-            name = "group_chat_members",
-            joinColumns = @JoinColumn(name = "group_chat_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> members = new HashSet<>(); // Lista članova grupe
+    @OneToMany(mappedBy = "groupChat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GroupChatMember> members = new HashSet<>();
 
     @NotNull
     @Column(name = "created_at", nullable = false, updatable = false)

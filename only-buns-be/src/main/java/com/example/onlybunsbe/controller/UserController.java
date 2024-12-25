@@ -4,9 +4,14 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.example.onlybunsbe.DTO.GroupChatDTO;
 import com.example.onlybunsbe.DTO.UserDTO;
+import com.example.onlybunsbe.dtomappers.GroupChatMapper;
+import com.example.onlybunsbe.model.GroupChat;
 import com.example.onlybunsbe.model.User;
+import com.example.onlybunsbe.service.GroupChatService;
 import com.example.onlybunsbe.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -23,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 public class UserController {
 
+    @Autowired
+    private GroupChatService groupChatService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -80,4 +87,11 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/user/{userId}/groups")
+    public List<GroupChatDTO> getGroupsForUser(@PathVariable Long userId) {
+        List<GroupChat> groups = groupChatService.getGroupsForUser(userId);
+        return groups.stream()
+                .map(GroupChatMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

@@ -4,7 +4,7 @@ import com.example.onlybunsbe.DTO.UserDTO;
 import com.example.onlybunsbe.model.ChatMessage;
 import com.example.onlybunsbe.model.GroupChat;
 import com.example.onlybunsbe.model.User;
-
+import com.example.onlybunsbe.model.GroupChatMember;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -42,10 +42,6 @@ public class UserMapper {
                 : List.of());
 
         // Grupe
-        dto.setGroupIds(user.getGroupChats() != null
-                ? user.getGroupChats().stream().map(GroupChat::getId).collect(Collectors.toList())
-                : List.of());
-
         return dto;
     }
 }

@@ -23,8 +23,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        System.out.println("Registering WebSocket handler for /api/chat");
         registry.addHandler(myWebSocketHandler, "/api/chat")
-                .setAllowedOriginPatterns("*") // Omogući sve origin-e (prilagodi za produkciju)
-                .addInterceptors(jwtHandshakeInterceptor); // Koristi JWT interceptor
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(jwtHandshakeInterceptor);
     }
 }

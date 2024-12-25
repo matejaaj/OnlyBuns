@@ -1,6 +1,9 @@
 package com.example.onlybunsbe.handler;
 
 import com.example.onlybunsbe.DTO.ChatMessageDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -14,14 +17,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
         sessions.add(session);
-        System.out.println("New WebSocket connection: " + session.getId());
     }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println("Received message: " + message.getPayload());
         // Primer odgovora (echo)
         session.sendMessage(new TextMessage("Echo: " + message.getPayload()));
     }
@@ -29,25 +30,28 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         sessions.remove(session);
-        System.out.println("WebSocket connection closed: " + session.getId());
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        System.err.println("Error in WebSocket session " + session.getId() + ": " + exception.getMessage());
         session.close(CloseStatus.SERVER_ERROR);
     }
 
     public static void broadcastMessage(ChatMessageDTO chatMessageDTO) {
-        TextMessage textMessage = new TextMessage(chatMessageDTO.toString());
-        for (WebSocketSession session : sessions) {
-            if (session.isOpen()) {
-                try {
-                    session.sendMessage(textMessage);
-                } catch (Exception e) {
-                    System.err.println("Error sending message to session " + session.getId() + ": " + e.getMessage());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        try {
+            String jsonMessage = objectMapper.writeValueAsString(chatMessageDTO);
+
+            for (WebSocketSession session : sessions) {
+                if (session.isOpen()) {
+                    session.sendMessage(new TextMessage(jsonMessage));
                 }
             }
+        } catch (Exception e) {
+            System.err.println("Error broadcasting message: " + e.getMessage());
         }
     }
 }

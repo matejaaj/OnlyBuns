@@ -29,52 +29,47 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {
         try {
-            // Ekstrakcija URL-a iz zahteva
             URI uri = request.getURI();
-            System.out.println("Request URI: " + uri);
 
-            // Parsiranje query parametara kako bi se ekstrahovao token
-            String query = uri.getQuery(); // Dobićete npr. "token=eyJhbGciOi..."
+            String query = uri.getQuery();
             String jwtToken = null;
 
             if (query != null) {
                 for (String param : query.split("&")) {
                     String[] keyValue = param.split("=");
                     if (keyValue.length == 2 && "token".equals(keyValue[0])) {
-                        jwtToken = keyValue[1]; // Ekstrakcija vrednosti tokena
+                        jwtToken = keyValue[1];
                         break;
                     }
                 }
             }
 
-            if (jwtToken != null) {
-                System.out.println("Extracted Token: " + jwtToken);
-
-                // Ekstrakcija email-a iz tokena
-                String email = tokenUtils.getEmailFromToken(jwtToken);
-                System.out.println("Extracted Email: " + email);
-
-                if (email != null) {
-                    // Dohvatanje korisnika iz baze na osnovu email-a
-                    UserDetails userDetails = userService.findByEmail(email);
-
-                    // Validacija tokena sa informacijama korisnika
-                    if (tokenUtils.validateToken(jwtToken, userDetails)) {
-                        // Dodavanje korisničkog imena u atribute za dalje korišćenje
-                        attributes.put("username", email);
-                        System.out.println("Handshake successful for user: " + email);
-                        return true;
-                    } else {
-                        System.out.println("Token validation failed for user: " + email);
-                    }
-                }
+            if (jwtToken == null) {
+                System.out.println("JWT token not found in query params");
+                return false;
             }
-        } catch (Exception e) {
-            System.out.println("Error during token validation: " + e.getMessage());
-        }
 
-        System.out.println("Token invalid or missing");
-        return false; // Odbijanje handshake-a ukoliko validacija ne uspe
+            System.out.println("JWT token: " + jwtToken);
+
+            String email = tokenUtils.getEmailFromToken(jwtToken);
+            if (email == null) {
+                System.out.println("Email could not be extracted from token");
+                return false;
+            }
+
+            UserDetails userDetails = userService.findByEmail(email);
+            if (!tokenUtils.validateToken(jwtToken, userDetails)) {
+                System.out.println("Token validation failed for email: " + email);
+                return false;
+            }
+
+            attributes.put("username", email);
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Error in handshake: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override

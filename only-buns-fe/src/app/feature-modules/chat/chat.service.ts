@@ -19,7 +19,6 @@ export class ChatService {
     const token = localStorage.getItem('jwt');
     const wsUrl = `ws://localhost:8080/api/chat?token=${token}`;
 
-    console.log('Connecting to WebSocket:', wsUrl);
 
     this.socket = new WebSocket(wsUrl);
 
@@ -37,7 +36,11 @@ export class ChatService {
         }
 
         const message = JSON.parse(messageData); // Parsiranje JSON-a nakon uklanjanja prefiksa
-        console.log('Message received:', message);
+        // Proveri i parsiraj `createdAt`
+        if (typeof message.createdAt === 'string') {
+          message.createdAt = new Date(message.createdAt); // Parsiraj ISO string
+        }
+
         this.messageSubject.next(message);
       } catch (error) {
         console.error('Error parsing WebSocket message:', error, event.data);
@@ -87,7 +90,6 @@ export class ChatService {
         ...message,
         groupId,
       };
-      console.log('Sending message:', payload);
       this.socket.send(JSON.stringify(payload));
     } else if (this.socket && this.socket.readyState === WebSocket.CONNECTING) {
       console.warn('WebSocket is still connecting. Retrying...');
@@ -108,7 +110,7 @@ export class ChatService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
         },
         body: JSON.stringify(groupPayload),
       })
@@ -119,7 +121,6 @@ export class ChatService {
           return response.json();
         })
         .then((data) => {
-          console.log('Group created:', data);
           observer.next(data);
           observer.complete();
         })
@@ -129,8 +130,8 @@ export class ChatService {
         });
     });
   }
-  loadMessages(groupId: number): Observable<any[]> {
-    const apiUrl = `http://localhost:8080/api/messages/${groupId}`;
+  getRecentOrAllMessages(groupId: number, userId: number): Observable<any[]> {
+    const apiUrl = `http://localhost:8080/api/messages/${groupId}/recent-messages?userId=${userId}`;
     return new Observable((observer) => {
       fetch(apiUrl, {
         headers: {
@@ -154,6 +155,30 @@ export class ChatService {
     });
   }
 
+  loadMessagesAfter(groupId: number, afterTimestamp: string): Observable<any[]> {
+    const apiUrl = `http://localhost:8080/api/messages/${groupId}/messages-after?afterTimestamp=${afterTimestamp}`;
+    return new Observable((observer) => {
+      fetch(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Error loading messages after: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          observer.next(data);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
   sendMessageToApi(message: any): Observable<any> {
     const apiUrl = `http://localhost:8080/api/messages`;
     return new Observable((observer) => {
@@ -172,7 +197,6 @@ export class ChatService {
           return response.json();
         })
         .then((data) => {
-          console.log('Message saved to database:', data);
           observer.next(data);
           observer.complete();
         })
@@ -183,4 +207,104 @@ export class ChatService {
     });
   }
 
+  addMemberToGroupByEmail(groupId: number, email: string): Observable<any> {
+    const apiUrl = `http://localhost:8080/api/groups/${groupId}/members`;
+    return new Observable((observer) => {
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        },
+        body: JSON.stringify({ email }), // Slanje email-a
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Error adding member: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          observer.next(data);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
+
+  removeMemberFromGroup(groupId: number, userId: number): Observable<any> {
+    const apiUrl = `http://localhost:8080/api/groups/${groupId}/members/${userId}`;
+    return new Observable((observer) => {
+      fetch(apiUrl, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Error removing member: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          observer.next(data);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
+  getGroupMembers(groupId: number): Observable<any[]> {
+    const apiUrl = `http://localhost:8080/api/groups/${groupId}/members`;
+    return new Observable((observer) => {
+      fetch(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Error loading members: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          observer.next(data);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
+  getUserGroups(userId: number): Observable<any[]> {
+    const apiUrl = `http://localhost:8080/api/user/${userId}/groups`;
+    return new Observable((observer) => {
+      fetch(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Error loading user groups: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          observer.next(data);
+          observer.complete();
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
 }
