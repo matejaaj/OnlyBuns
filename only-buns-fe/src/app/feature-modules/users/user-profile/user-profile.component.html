@@ -1,1 +1,68 @@
-<p>user-profile works!</p>
+<div class="user-profile">
+  <h1>User Profile</h1>
+
+
+  <!-- Full Name -->
+  <div>
+    <label>Full Name:</label>
+    <p>{{ user?.firstName }} {{ user?.lastName }}</p>
+  </div>
+
+  <!-- Email -->
+  <div>
+    <label>Email:</label>
+    <p>{{ user?.email }}</p>
+  </div>
+
+  <!-- Change Password -->
+  <div>
+    <label>Change Password:</label>
+  </div>
+
+  <!-- Address -->
+  <div>
+    <label>Address:</label>
+  </div>
+
+  <!-- Followers Count -->
+  <div>
+    <label>Followers:</label>
+  </div>
+
+  <!-- User Posts -->
+  <div>
+    <h2>Your Posts</h2>
+    <ul>
+      <li *ngFor="let post of user?.posts">{{ post.content }}</li>
+    </ul>
+  </div>
+
+  <!-- Followers -->
+  <div>
+    <h2>Followers</h2>
+    <ul>
+      <li *ngFor="let follower of followers">{{ follower.followerUsername }}</li>
+    </ul>
+  </div>
+
+  <!-- Following -->
+  <div>
+    <h2>Following</h2>
+    <ul>
+      <li *ngFor="let follow of following">
+        {{ follow.followedUsername }}
+        <button (click)="unfollowUser(follow.followedId)">Unfollow</button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Follow a user -->
+  <div>
+    <input type="text" [(ngModel)]="emailToFollow" placeholder="Enter email to follow" />
+    <button (click)="followUser()">Follow</button>
+  </div>
+  <!-- Prikaz poruke o grešci -->
+  <div *ngIf="followSuccess" class="alert alert-info">
+    {{ followSuccess }}
+  </div>
+</div>

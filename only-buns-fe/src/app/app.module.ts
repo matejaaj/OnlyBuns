@@ -19,6 +19,7 @@ import { UserListComponent } from './feature-modules/users/user-list/user-list.c
 import { NearbyPostsComponent } from './feature-modules/posts/nearby-posts/nearby-posts.component';
 import {TrendsComponent} from './feature-modules/trends/trends.component';
 import {AnalyticsComponent} from './feature-modules/analytics/analytics.component';
+import { UserProfileComponent} from './feature-modules/users/user-profile/user-profile.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import {AnalyticsComponent} from './feature-modules/analytics/analytics.componen
     NearbyPostsComponent,
     TrendsComponent,
     AnalyticsComponent,
+    UserProfileComponent,
   ],
   providers: [
     {

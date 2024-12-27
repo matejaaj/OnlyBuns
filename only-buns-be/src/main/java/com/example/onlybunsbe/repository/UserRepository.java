@@ -25,4 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM Comment c " +
             "WHERE c.user.id NOT IN (SELECT p.user.id FROM Post p)")
     long countWithOnlyComments();
+
+    @Query("SELECT u FROM User u JOIN u.following f WHERE f.id = :userId")
+    List<User> findFollowers(@Param("userId") Long userId);
 }

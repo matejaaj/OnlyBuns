@@ -7,13 +7,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.example.onlybunsbe.DTO.GroupChatDTO;
+import com.example.onlybunsbe.DTO.PostDTO;
 import com.example.onlybunsbe.DTO.UserDTO;
 import com.example.onlybunsbe.dtomappers.GroupChatMapper;
+import com.example.onlybunsbe.dtomappers.UserMapper;
 import com.example.onlybunsbe.model.GroupChat;
 import com.example.onlybunsbe.model.User;
 import com.example.onlybunsbe.service.GroupChatService;
 import com.example.onlybunsbe.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -93,5 +96,42 @@ public class UserController {
         return groups.stream()
                 .map(GroupChatMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping("/user/{userId}/follow")
+    public ResponseEntity<String> followUser(@PathVariable Long userId, Principal principal) {
+        userService.followUser(principal.getName(), userId);
+        return ResponseEntity.ok("Started following user");
+    }
+
+    @DeleteMapping("/user/{userId}/unfollow")
+    public ResponseEntity<String> unfollowUser(@PathVariable Long userId, Principal principal) {
+        userService.unfollowUser(principal.getName(), userId);
+        return ResponseEntity.ok("Stopped following user");
+    }
+
+    @GetMapping("/user/feed")
+    public List<PostDTO> getFeed(Principal principal) {
+        return userService.getFeed(principal.getName());
+    }
+
+    @GetMapping("/user/{userId}/following")
+    public List<UserDTO> getFollowing(@PathVariable Long userId) {
+        return userService.getFollowing(userId);
+    }
+
+    @GetMapping("/user/{userId}/followers")
+    public List<UserDTO> getFollowers(@PathVariable Long userId) {
+        return userService.getFollowers(userId);
+    }
+
+    @GetMapping("/user/searchEmail")
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        UserDTO userDTO = UserMapper.toDTO(user);
+        return ResponseEntity.ok(userDTO);
     }
 }

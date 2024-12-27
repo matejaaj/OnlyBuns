@@ -7,10 +7,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.example.onlybunsbe.DTO.PostDTO;
 import com.example.onlybunsbe.DTO.UserDTO;
 import com.example.onlybunsbe.DTO.UserRequest;
+import com.example.onlybunsbe.dtomappers.UserMapper;
+import com.example.onlybunsbe.dtomappers.PostMapper;
+import com.example.onlybunsbe.model.Follow;
 import com.example.onlybunsbe.model.Role;
 import com.example.onlybunsbe.model.User;
+import com.example.onlybunsbe.repository.PostRepository;
+import com.example.onlybunsbe.repository.FollowRepository;
 import com.example.onlybunsbe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,12 +24,16 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -33,6 +43,12 @@ public class UserService {
 
     @Autowired
     private EmailSenderService emailSenderService;
+
+    @Autowired
+    private PostMapper postMapper;
+
+    @Autowired
+    private FollowRepository followRepository;
 
     // Pronalazi korisnika po korisničkom imenu
     public User findByUsername(String username) throws UsernameNotFoundException {
@@ -104,7 +120,7 @@ public class UserService {
 
         // Primeni sortiranje
         Comparator<User> comparator = "followers".equals(sortBy)
-                ? Comparator.comparingInt(user -> user.getFollowers().size())
+                ? Comparator.comparingInt(user -> calculateFollowersCount(user.getId()))
                 : Comparator.comparing(User::getEmail);
 
         if (!isAscending) {
@@ -155,6 +171,61 @@ public class UserService {
         }
     }
 
+    public void followUser(String currentUsername, Long userIdToFollow) {
+        User currentUser = userRepository.findByUsername(currentUsername);
+        User userToFollow = userRepository.findById(userIdToFollow)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (followRepository.existsByFollowerAndFollowed(currentUser, userToFollow)) {
+            throw new RuntimeException("Already following this user");
+        }
+
+        Follow follow = new Follow();
+        follow.setFollower(currentUser);
+        follow.setFollowed(userToFollow);
+        followRepository.save(follow);
+    }
+
+    public void unfollowUser(String currentUsername, Long userIdToUnfollow) {
+        User currentUser = userRepository.findByUsername(currentUsername);
+        User userToUnfollow = userRepository.findById(userIdToUnfollow)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Follow follow = followRepository.findByFollowerAndFollowed(currentUser, userToUnfollow)
+                .orElseThrow(() -> new RuntimeException("Not following this user"));
+
+        followRepository.delete(follow);
+    }
+
+    public List<PostDTO> getFeed(String currentUsername) {
+        User currentUser = userRepository.findByUsername(currentUsername);
+
+        Set<User> following = followRepository.findAllByFollower(currentUser).stream()
+                .map(Follow::getFollowed)
+                .collect(Collectors.toSet()); // Koristi Set umesto List
+
+        return postRepository.findByUserIn(following).stream()
+                .map(postMapper::toPostDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getFollowing(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        return followRepository.findAllByFollower(user).stream()
+                .map(follow -> UserMapper.toDTO(follow.getFollowed())) // Koristi toDTO
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getFollowers(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        return followRepository.findAllByFollowed(user).stream()
+                .map(follow -> UserMapper.toDTO(follow.getFollower())) // Koristi toDTO
+                .collect(Collectors.toList());
+    }
+
+
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(Long.valueOf(user.getId()));
@@ -165,9 +236,15 @@ public class UserService {
         dto.setAddress(user.getAddress());
         dto.setRole(user.getRole().getName());
         dto.setPostCount(user.getPosts() != null ? user.getPosts().size() : 0);
-        dto.setFollowingCount(user.getFollowing() != null ? user.getFollowing().size() : 0);
-        dto.setFollowerCount(user.getFollowers() != null ? user.getFollowers().size() : 0);
         return dto;
+    }
+
+    private int calculateFollowersCount(Long userId) {
+        // Tražimo sve korisnike koji imaju trenutnog korisnika u svom `following` setu
+        return (int) userRepository.findAll().stream()
+                .filter(u -> u.getFollowing().stream()
+                        .anyMatch(following -> following.getId().equals(userId)))
+                .count();
     }
 }
 

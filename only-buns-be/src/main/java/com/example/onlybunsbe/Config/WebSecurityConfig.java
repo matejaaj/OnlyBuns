@@ -75,6 +75,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/analytics/**").hasAnyRole("ADMIN")
                         .requestMatchers("/api/groups/**").authenticated()
                         .requestMatchers("/api/chat/**").permitAll()
+                        .requestMatchers("/api/follow/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

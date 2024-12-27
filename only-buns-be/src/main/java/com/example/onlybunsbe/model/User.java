@@ -80,16 +80,15 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Post> posts;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_followers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "follower_id")
-    )
-    private Set<User> followers;
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> following = new HashSet<>();
 
-    @ManyToMany(mappedBy = "followers")
-    private Set<User> following;
+    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> followers = new HashSet<>();
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @JsonIgnore
     @Override
