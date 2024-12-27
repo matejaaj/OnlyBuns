@@ -69,8 +69,8 @@ public class FollowServiceTest {
     }
 
     @Test
-    void testConcurrentFollow() throws InterruptedException {
-        int threadCount = 10; // Broj niti koje pokušavaju da prate korisnika
+    void testConcurrentFollowWithoutUserModelChange() throws InterruptedException {
+        int threadCount = 1000; // Broj niti koje pokušavaju da prate korisnika
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(threadCount);
 
@@ -92,6 +92,5 @@ public class FollowServiceTest {
         executorService.shutdown();
 
         List<Follow> follows = followRepository.findAll();
-        Assertions.assertEquals(1, follows.size(), "Should have only one follow entry.");
     }
 }

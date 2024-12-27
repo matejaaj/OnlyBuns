@@ -86,10 +86,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Follow> followers = new HashSet<>();
 
-    @Version
-    @Column(name = "version")
-    private Long version;
-
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

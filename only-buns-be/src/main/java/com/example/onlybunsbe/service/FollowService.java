@@ -46,20 +46,20 @@ public class FollowService {
             throw new RuntimeException("Already following this user");
         }
 
+        // Simulacija kašnjenja da se poveća šansa za konkurentni pristup
+//        try {
+//            Thread.sleep(100); // 100ms pauze
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt(); // Reset interrupt flag
+//            throw new RuntimeException("Thread interrupted", e);
+//        }
+
         // Kreiraj novi Follow entitet
         Follow follow = new Follow();
         follow.setFollower(currentUser);
         follow.setFollowed(userToFollow);
 
         followRepository.save(follow);
-
-        // Ažuriraj korisnika sa optimističkim zaključavanjem
-        userToFollow.setVersion(userToFollow.getVersion());
-        try {
-            userRepository.save(userToFollow);
-        } catch (OptimisticLockException e) {
-            throw new RuntimeException("Concurrent update detected. Please try again.", e);
-        }
     }
 
 
