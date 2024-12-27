@@ -1,6 +1,8 @@
 package com.example.onlybunsbe.service;
 
 import com.example.onlybunsbe.DTO.LikeDTO;
+import com.example.onlybunsbe.DTO.PostDTO;
+import com.example.onlybunsbe.dtomappers.PostMapper;
 import com.example.onlybunsbe.model.Like;
 import com.example.onlybunsbe.model.Post;
 import com.example.onlybunsbe.model.User;
@@ -23,24 +25,44 @@ public class LikeService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    private final PostMapper postMapper;
+
     @Transactional
-    public boolean likePost(Long postId, Long userId) {
-        Optional<Post> post = postRepository.findById(postId);
-        Optional<User> user = userRepository.findById(userId);
-        System.out.print("Pronadjen post = " + post + " user = " + user);
-        if (post.isPresent() && user.isPresent()) {
-            if (likeRepository.existsByPostAndUser(post.get(), user.get())) {
-                return false; // Već lajkovano
+    public PostDTO likePost(Long postId, Long userId) {
+        Optional<Post> postOpt = postRepository.findById(postId);
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        if (postOpt.isPresent() && userOpt.isPresent()) {
+            Post post = postOpt.get();
+            User user = userOpt.get();
+
+            if (likeRepository.existsByPostAndUser(post, user)) {
+                return null;
             }
+
+            // Dodajemo novu instancu lajkova
             Like like = new Like();
-            like.setPost(post.get());
-            like.setUser(user.get());
+            like.setUser(user);
             like.setLikedAt(Instant.now());
-            likeRepository.save(like);
-            return true;
+
+
+            // Simulacija konflikta sa Thread.sleep()
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+
+            post.addLike(like);
+            postRepository.save(post);
+
+            return postMapper.toPostDTO(post);
         }
-        return false;
+
+        return null;
     }
+
 
     @Transactional
     public void removeLikesByPost(Post post) {

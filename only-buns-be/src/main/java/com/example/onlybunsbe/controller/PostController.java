@@ -69,7 +69,7 @@ public class PostController {
         return ResponseEntity.status(403).build(); // Forbidden ako korisnik nije vlasnik
     }
 
-    @PostMapping(consumes = {"multipart/form-data"})
+    @PostMapping(consumes = {"multipart/form-data"}, path = "/create")
     public ResponseEntity<PostDTO> createPost(
             @RequestPart("post") PostDTO postDTO,
             @RequestPart("image") MultipartFile image, HttpServletRequest request) {
@@ -86,5 +86,12 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // greška pri pisanju slike
         }
     }
+
+    @PutMapping("/ad-eligibility/{postId}")
+    public ResponseEntity<PostDTO> markPostAsEligibleForAd(@PathVariable Long postId) {
+        PostDTO updatedPost = postService.markPostAsEligible(postId);
+        return ResponseEntity.ok(updatedPost); // Vraćamo ažurirani PostDTO
+    }
+
 
 }
