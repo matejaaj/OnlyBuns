@@ -1,1 +1,51 @@
-<p>chat works!</p>
+<div class="user-groups">
+  <h3>Your Groups</h3>
+  <div class="group-cards">
+    <div class="group-card" *ngFor="let group of userGroups" (click)="selectGroup(group.id)">
+      <h4>{{ group.name }}</h4>
+      <p>Admin: {{ group.adminId }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="chat-container" *ngIf="groupId">
+  <h3>Chat in Group: {{ groupId }}</h3>
+  <div class="messages">
+    <div *ngFor="let message of messages">
+      <div class="message">
+        <strong>{{ message.senderId }}</strong>: {{ message.content }}
+        <span class="timestamp">{{ message.createdAt | date: 'shortTime' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <input [(ngModel)]="message" placeholder="Type a message..." />
+  <button (click)="sendMessage()">Send</button>
+
+</div>
+
+<div *ngIf="isCurrentUserAdmin">
+  <h3>Add Member</h3>
+  <input [(ngModel)]="newMemberEmail" placeholder="Enter email to add" />
+  <button (click)="addMember()">Add Member</button>
+</div>
+
+<div class="group-members">
+  <h3>Group Members</h3>
+  <ul>
+    <li *ngFor="let member of groupMembers">
+      <span>{{ member.email }}</span>
+      <button *ngIf="member.id !== authService.getUserId() && isCurrentUserAdmin" (click)="removeMember(member.id)">Remove</button>
+    </li>
+  </ul>
+</div>
+<div class="create-group">
+  <button (click)="openCreateGroupModal()">Create Group Chat</button>
+</div>
+
+<div *ngIf="showCreateGroupModal" class="modal">
+  <h2>Create Group Chat</h2>
+  <input [(ngModel)]="newGroupName" placeholder="Group Name" />
+  <button (click)="createGroup()">Create</button>
+  <button (click)="closeCreateGroupModal()">Cancel</button>
+</div>
