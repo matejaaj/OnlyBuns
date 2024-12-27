@@ -1,53 +1,20 @@
 <div class="user-profile">
-  <h1>User Profile</h1>
+  <h1>{{ user?.firstName }} {{ user?.lastName }}</h1>
+  <p>Email: {{ user?.email }}</p>
 
+  <!-- Current User Section -->
+  <div *ngIf="isCurrentUserProfile">
+    <h2>Your Profile</h2>
+    <p>Address: {{ user?.address }}</p>
 
-  <!-- Full Name -->
-  <div>
-    <label>Full Name:</label>
-    <p>{{ user?.firstName }} {{ user?.lastName }}</p>
-  </div>
+    <!-- Search User by Email -->
+    <div>
+      <input type="text" [(ngModel)]="emailToSearch" placeholder="Enter email to search" />
+      <button (click)="searchUserByEmail()">Search</button>
+    </div>
 
-  <!-- Email -->
-  <div>
-    <label>Email:</label>
-    <p>{{ user?.email }}</p>
-  </div>
-
-  <!-- Change Password -->
-  <div>
-    <label>Change Password:</label>
-  </div>
-
-  <!-- Address -->
-  <div>
-    <label>Address:</label>
-  </div>
-
-  <!-- Followers Count -->
-  <div>
-    <label>Followers:</label>
-  </div>
-
-  <!-- User Posts -->
-  <div>
-    <h2>Your Posts</h2>
-    <ul>
-      <li *ngFor="let post of user?.posts">{{ post.content }}</li>
-    </ul>
-  </div>
-
-  <!-- Followers -->
-  <div>
-    <h2>Followers</h2>
-    <ul>
-      <li *ngFor="let follower of followers">{{ follower.followerUsername }}</li>
-    </ul>
-  </div>
-
-  <!-- Following -->
-  <div>
-    <h2>Following</h2>
+    <!-- Your Following List -->
+    <h3>Your Following:</h3>
     <ul>
       <li *ngFor="let follow of following">
         {{ follow.followedUsername }}
@@ -56,13 +23,14 @@
     </ul>
   </div>
 
-  <!-- Follow a user -->
-  <div>
-    <input type="text" [(ngModel)]="emailToFollow" placeholder="Enter email to follow" />
+  <!-- Other User Section -->
+  <div *ngIf="!isCurrentUserProfile">
+    <h2>{{ user?.username }}'s Profile</h2>
+    <p>Address: {{ user?.address }}</p>
     <button (click)="followUser()">Follow</button>
   </div>
-  <!-- Prikaz poruke o grešci -->
-  <div *ngIf="followSuccess" class="alert alert-info">
-    {{ followSuccess }}
-  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="followSuccess" class="alert alert-info">{{ followSuccess }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 </div>

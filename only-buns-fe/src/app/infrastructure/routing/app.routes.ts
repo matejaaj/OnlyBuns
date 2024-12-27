@@ -22,4 +22,5 @@ export const routes: Routes = [
   { path: 'chat', component: ChatComponent },
   { path: 'trends', component: TrendsComponent},
   { path: 'analytics', component: AnalyticsComponent},
+  { path: 'profile/:id', component: UserProfileComponent }, // Koristimo istu komponentu za oba slučaja
 ];
