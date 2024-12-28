@@ -27,12 +27,16 @@ public class ChatController {
 
     // Endpoint za slanje poruke
     @PostMapping
-    public ResponseEntity<ChatMessageDTO> sendMessage(@RequestBody ChatMessageDTO chatMessageDTO) {
+    public ResponseEntity<?> sendMessage(@RequestBody ChatMessageDTO chatMessageDTO) {
+        // Provera da li je korisnik član grupe
+        boolean isMember = groupChatService.isUserMemberOfGroup(chatMessageDTO.getGroupId(), chatMessageDTO.getSenderId());
+
+        if (!isMember) {
+            return ResponseEntity.status(403).body("You are no longer a member of this group.");
+        }
 
         ChatMessage chatMessage = ChatMessageMapper.toEntity(chatMessageDTO);
-
         ChatMessage savedMessage = chatMessageService.saveMessage(chatMessage);
-
         ChatMessageDTO responseDto = ChatMessageMapper.toChatMessageDTO(savedMessage);
         WebSocketHandler.broadcastMessage(responseDto);
 

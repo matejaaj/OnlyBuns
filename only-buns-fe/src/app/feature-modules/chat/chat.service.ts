@@ -7,9 +7,13 @@ import { Observable, Subject } from 'rxjs';
 export class ChatService {
   private socket: WebSocket | null = null;
   private messageSubject: Subject<any> = new Subject();
+  private notificationSocket: Subject<any> = new Subject();
 
   constructor() {}
 
+  onUserNotification(): Observable<any> {
+    return this.notificationSocket.asObservable(); // Pretplata na sve poruke sa WebSocket-a
+  }
   connect(): void {
     if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
       console.warn('WebSocket is already open or connecting');
@@ -28,19 +32,13 @@ export class ChatService {
 
     this.socket.onmessage = (event) => {
       try {
-        let messageData = event.data;
+        const message = JSON.parse(event.data);
 
-        // Proverite i uklonite prefiks "Echo:"
-        if (messageData.startsWith('Echo:')) {
-          messageData = messageData.replace('Echo:', '').trim();
+        if (message.type === 'REMOVED_FROM_GROUP') {
+          this.notificationSocket.next(message); // Emituj obaveštenje
         }
 
-        const message = JSON.parse(messageData); // Parsiranje JSON-a nakon uklanjanja prefiksa
-        // Proveri i parsiraj `createdAt`
-        if (typeof message.createdAt === 'string') {
-          message.createdAt = new Date(message.createdAt); // Parsiraj ISO string
-        }
-
+        // Emitovanje za sve ostale poruke
         this.messageSubject.next(message);
       } catch (error) {
         console.error('Error parsing WebSocket message:', error, event.data);

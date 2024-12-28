@@ -35,6 +35,16 @@ export class ChatComponent implements OnInit {
   ngOnInit(): void {
     this.chatService.connect();
 
+    // Pretplata na WebSocket događaje za obaveštenja
+    this.chatService.onUserNotification().subscribe({
+      next: (notification) => {
+        if (notification.type === 'REMOVED_FROM_GROUP' && notification.groupId === this.groupId) {
+          alert('You have been removed from the group.');
+          this.clearGroupState();
+        }
+      },
+      error: (error) => console.error('WebSocket notification error:', error),
+    });
     // Učitaj dostupne grupe korisnika
     this.loadUserGroups();
   }
@@ -114,24 +124,39 @@ export class ChatComponent implements OnInit {
   }
 
   sendMessage(): void {
-    if (this.message.trim() && this.groupId) {
-      const messagePayload: ChatMessage = {
-        senderId: this.authService.getUserId(),
-        content: this.message,
-        groupId: this.groupId,
-        createdAt: new Date().toISOString(),
-        type: 'CHAT',
-      };
+    this.chatService.getGroupMembers(this.groupId).subscribe({
+      next: (members) => {
+        this.groupMembers = members;
+        const isMember = this.groupMembers.some(
+          (member) => member.id === this.authService.getUserId()
+        );
 
-      this.chatService.sendMessageToApi(messagePayload).subscribe({
-        next: () => {
-          this.message = ''; // Resetuj unos poruke
-        },
-        error: (error) => console.error('Error sending message to API:', error),
-      });
-    } else {
-      console.error('No group selected or message is empty.');
-    }
+        if (isMember) {
+          if (this.message.trim() && this.groupId) {
+            const messagePayload: ChatMessage = {
+              senderId: this.authService.getUserId(),
+              content: this.message,
+              groupId: this.groupId,
+              createdAt: new Date().toISOString(),
+              type: 'CHAT',
+            };
+
+            this.chatService.sendMessageToApi(messagePayload).subscribe({
+              next: () => {
+                this.message = ''; // Resetuj unos poruke
+              },
+              error: (error) => console.error('Error sending message to API:', error),
+            });
+          } else {
+            console.error('No group selected or message is empty.');
+          }
+        } else {
+          alert('You are no longer a member of this group.');
+          window.location.reload(); // Osveži stranicu
+        }
+      },
+      error: (error) => console.error('Error validating group membership:', error),
+    });
   }
 
   loadGroupMembers(): void {
@@ -171,6 +196,12 @@ export class ChatComponent implements OnInit {
         next: (data) => {
           console.log('Member removed successfully:', data);
           this.loadGroupMembers();
+
+          // Ako je trenutni korisnik uklonjen, osveži stranicu
+          if (userId === this.authService.getUserId()) {
+            alert('You have been removed from the group.');
+            window.location.reload(); // Ili preusmeri na drugu stranicu
+          }
         },
         error: (error) => console.error('Error removing member:', error),
       });
@@ -201,4 +232,10 @@ export class ChatComponent implements OnInit {
     }
   }
 
+  clearGroupState(): void {
+    this.messages = [];
+    this.groupMembers = [];
+    this.groupId = -1; // Ili `null` ako koristite takvo stanje
+    this.isCurrentUserAdmin = false;
+  }
 }

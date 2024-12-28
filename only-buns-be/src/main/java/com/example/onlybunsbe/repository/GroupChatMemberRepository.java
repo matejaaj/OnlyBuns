@@ -22,4 +22,6 @@ public interface GroupChatMemberRepository extends JpaRepository<GroupChatMember
     List<GroupChatMember> findAllByGroupChatId(Long groupId);
 
     List<GroupChatMember> findAllByUserId(Long userId);
+
+    boolean existsByGroupChatIdAndUserId(Long groupId, Long userId);
 }
