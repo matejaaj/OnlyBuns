@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Post as Post } from '../posts/model/post';
-import { Comment } from './model/comment';
+import { Post } from '../posts/model/post';
+import { Comment } from '../posts/model/comment';
 import { ApiService } from '../../infrastructure/api.service';
-import { Like } from './model/like';
-import {HttpClient} from '@angular/common/http';
-import {map} from 'rxjs/operators';
+import { Like } from '../posts/model/like';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -23,11 +23,18 @@ export class PostService {
     return this.apiService.get(this.postApiUrl);
   }
 
-  likePost(postId: number, userId: number): Observable<void> {
-    return this.apiService.post(
-      `${this.likeApiUrl}/${postId}?userId=${userId}`,
-      {}
-    );
+  likePost(postId: number): Observable<Post> {
+    return this.apiService
+      .postWithResponse<Post>(`${this.likeApiUrl}/${postId}`, null)
+      .pipe(
+        map((response) => {
+          const post = response.body; // Ekstrakcija tela odgovora
+          if (!post) {
+            throw new Error('Invalid response: Post data not found');
+          }
+          return post; // Vraćamo ažurirani post objekat
+        })
+      );
   }
 
   addComment(
@@ -70,9 +77,9 @@ export class PostService {
     // Dodaj sliku
     formData.append('image', image);
 
-    // Pozivamo ApiService bez postavljanja Content-Type zaglavlja, jer će
-    // Angular automatski postaviti "multipart/form-data" kada koristi FormData
-    return this.apiService.post(this.postApiUrl, formData);
+    const createUrl = `${this.postApiUrl}/create`;
+
+    return this.apiService.post(createUrl, formData);
   }
 
   getCachedImage(imagePath: string): Observable<string> {
@@ -102,5 +109,17 @@ export class PostService {
   getUserFeed(userId: number): Observable<Post[]> {
     console.log(`Fetching user feed for userId: ${userId}`);
     return this.apiService.get(`http://localhost:8080/api/posts/user-feed?userId=${userId}`);
+  }
+
+  updateAdEligibility(postId: number): Observable<Post> {
+    return this.apiService
+      .put(`${this.postApiUrl}/ad-eligibility/${postId}`, {})
+      .pipe(
+        map((response: any) => {
+          // Pretpostavka da API vraća ažurirani post
+          const updatedPost: Post = response;
+          return updatedPost; // Osiguravamo da Observable vrati ažurirani post
+        })
+      );
   }
 }

@@ -119,3 +119,9 @@ body {
   background-color: #faf9f7;
   color: #5a5a5a;
 }
+
+.ad-status {
+  font-weight: bold;
+  color: #28a745; /* Zelena boja za potvrdu */
+  margin-top: 10px;
+}

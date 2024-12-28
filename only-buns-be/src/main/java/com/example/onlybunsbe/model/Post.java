@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -40,13 +41,40 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Dodajemo polje likes da predstavlja lajkove povezane sa objavom
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name="location_id")
+    @JoinColumn(name = "location_id")
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Location location;
+
+
+    @NotNull
+    @Column(name = "like_count", nullable = false)
+    @ColumnDefault("0")
+    private Integer likeCount = 0;
+
+    // Verzija za optimističko zaključavanje
+    @Version
+    @Column(name = "version", nullable = false)
+    private Integer version;
+
+    @NotNull
+    @Column(name = "eligible_for_ad", nullable = false)
+    @ColumnDefault("false")
+    private Boolean eligibleForAd = false;
+
+
+    public void addLike(Like like) {
+        if (likes == null) {
+            likes = new ArrayList<>();
+        }
+        likes.add(like); // Dodajemo lajk u kolekciju
+        like.setPost(this); // Postavljamo referencu na trenutni post
+        likeCount = (likeCount == null ? 0 : likeCount) + 1; // Ažuriramo broj lajkova
+    }
 }

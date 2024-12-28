@@ -47,7 +47,7 @@ public class PostMapper {
         user.setId(postDTO.getUserId());
         post.setUser(user);
 
-        // Postavite dodatna polja po potrebi
+        post.setEligibleForAd(postDTO.isEligibleForAd());
         return post;
     }
 
@@ -88,6 +88,7 @@ public class PostMapper {
             dto.setComments(commentDTOs);
         }
 
+        dto.setEligibleForAd(post.getEligibleForAd());
         dto.setUserId(post.getUser().getId());
         return dto;
     }

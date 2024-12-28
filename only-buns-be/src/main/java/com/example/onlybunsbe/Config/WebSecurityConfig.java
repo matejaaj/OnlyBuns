@@ -1,5 +1,7 @@
 package com.example.onlybunsbe.Config;
 
+import com.example.onlybunsbe.infrastructure.monitoring.ActiveUserFilter;
+import com.example.onlybunsbe.infrastructure.monitoring.ActiveUserTracker;
 import com.example.onlybunsbe.security.auth.RestAuthenticationEntryPoint;
 import com.example.onlybunsbe.security.auth.TokenAuthenticationFilter;
 import com.example.onlybunsbe.service.CustomUserDetailsService;
@@ -35,6 +37,9 @@ public class WebSecurityConfig {
     @Autowired
     private TokenUtils tokenUtils;
 
+    @Autowired
+    private ActiveUserTracker activeUserTracker;
+
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
@@ -64,7 +69,11 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(restAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/favicon.ico").permitAll()
+                        .requestMatchers("/error").permitAll() // Dozvoljava pristup error handler-u
+                        .requestMatchers("/actuator/prometheus").permitAll() // Dozvoljava pristup bez autentikacije
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/posts/ad-eligibility/**").hasRole("ADMIN")
                         .requestMatchers("/api/posts/**").permitAll()
                         .requestMatchers("api/user/**").authenticated()
                         .requestMatchers("/api/likes/**").authenticated()// `ROLE_USER` će se automatski prepoznati
@@ -80,8 +89,9 @@ public class WebSecurityConfig {
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
-                .addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userDetailsService()),
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userDetailsService()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new ActiveUserFilter(activeUserTracker), TokenAuthenticationFilter.class);
+
 
         http.authenticationProvider(authenticationProvider());
 
@@ -95,7 +105,8 @@ public class WebSecurityConfig {
                 "/api-docs/**",
                 "/swagger-resources/**",
                 "/webjars/**",
-                "/uploads/**"
+                "/uploads/**",
+                "/actuator/prometheus"
         );
     }
 }

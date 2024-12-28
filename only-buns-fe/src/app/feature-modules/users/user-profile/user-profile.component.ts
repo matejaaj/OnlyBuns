@@ -140,9 +140,7 @@ export class UserProfileComponent implements OnInit {
       },
       (err) => {
         if (err.status === 429) {
-          this.followSuccess = 'You have reached the follow limit. Please wait a minute before trying again.';
         } else {
-          this.errorMessage = 'Failed to follow user.';
         }
       }
     );
@@ -151,11 +149,9 @@ export class UserProfileComponent implements OnInit {
   unfollowUser(userId: number): void {
     this.userService.unfollowUser(userId).subscribe(
       () => {
-        this.successMessage = 'User unfollowed successfully.';
         this.loadFollowing();
       },
       (err) => {
-        this.errorMessage = 'Failed to unfollow user.';
       }
     );
   }

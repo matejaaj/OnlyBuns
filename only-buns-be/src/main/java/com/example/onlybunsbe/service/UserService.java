@@ -239,12 +239,21 @@ public class UserService {
         return dto;
     }
 
+
     private int calculateFollowersCount(Long userId) {
         // Tražimo sve korisnike koji imaju trenutnog korisnika u svom `following` setu
         return (int) userRepository.findAll().stream()
                 .filter(u -> u.getFollowing().stream()
                         .anyMatch(following -> following.getId().equals(userId)))
                 .count();
+    }
+
+    public void updateLastLogin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+        user.setLastLoginDate(Instant.now());
+        userRepository.save(user);
+
     }
 }
 

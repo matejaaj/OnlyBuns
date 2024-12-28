@@ -15,4 +15,5 @@ public class PostDTO {
     private LocationDTO location;
     private int likeCount;
     private List<CommentDTO> comments;
+    private boolean eligibleForAd;
 }

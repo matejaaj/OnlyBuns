@@ -5,6 +5,9 @@ import com.example.onlybunsbe.DTO.ImageDTO;
 import com.example.onlybunsbe.DTO.LocationDTO;
 import com.example.onlybunsbe.DTO.PostDTO;
 import com.example.onlybunsbe.model.*;
+import com.example.onlybunsbe.infrastructure.messaging.RabbitMQPublisher;
+import com.example.onlybunsbe.model.Comment;
+import com.example.onlybunsbe.model.Like;
 import com.example.onlybunsbe.repository.*;
 import com.example.onlybunsbe.dtomappers.PostMapper;
 import com.example.onlybunsbe.model.Comment;
@@ -36,6 +39,7 @@ public class PostService {
     private CommentRepository commentRepository;
     private LocationRepository locationRepository;
     private FollowRepository followRepository;
+    private final RabbitMQPublisher rabbitMQPublisher; // Dodato
     @Transactional
     public Optional<PostDTO> getPostById(Long id) {
         return postRepository.findById(id).map(postMapper::toPostDTO);
@@ -43,53 +47,9 @@ public class PostService {
 
     @Transactional
     public List<PostDTO> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(post -> {
-            PostDTO dto = new PostDTO();
-
-            // Post osnovni podaci
-            dto.setId(post.getId());
-            dto.setDescription(post.getDescription());
-            dto.setCreatedAt(post.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
-            dto.setUserId(post.getUser() != null ? post.getUser().getId() : null);
-            dto.setLikeCount(post.getLikes() != null ? post.getLikes().size() : 0);
-
-            // Mapiranje za ImageDTO
-            if (post.getImage() != null) {
-                ImageDTO imageDTO = new ImageDTO();
-                imageDTO.setId(post.getImage().getId());
-                imageDTO.setPath(post.getImage().getPath());
-                imageDTO.setCompressed(post.getImage().isCompressed());
-                imageDTO.setUploadedAt(post.getImage().getUploadedAt());
-                dto.setImage(imageDTO);
-            }
-
-            // Mapiranje za LocationDTO
-            if (post.getLocation() != null) {
-                LocationDTO locationDTO = new LocationDTO();
-                locationDTO.setId(post.getLocation().getId());
-                locationDTO.setCountry(post.getLocation().getCountry());
-                locationDTO.setCity(post.getLocation().getCity());
-                locationDTO.setAddress(post.getLocation().getAddress());
-                locationDTO.setNumber(post.getLocation().getNumber());
-                locationDTO.setLatitude(post.getLocation().getLatitude());
-                locationDTO.setLongitude(post.getLocation().getLongitude());
-                dto.setLocation(locationDTO);
-            }
-
-            // Mapiranje komentara u CommentDTO
-            dto.setComments(post.getComments() != null ? post.getComments().stream()
-                    .sorted((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt())) // Sortiraj najnovije komentare prvo
-                    .map(comment -> {
-                        CommentDTO commentDTO = new CommentDTO();
-                        commentDTO.setId(comment.getId());
-                        commentDTO.setContent(comment.getContent());
-                        commentDTO.setCreatedAt(comment.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDateTime());
-                        commentDTO.setUserName(comment.getUser() != null ? comment.getUser().getUsername() : "");
-                        return commentDTO;
-                    }).collect(Collectors.toList()) : new ArrayList<>());
-
-            return dto;
-        }).collect(Collectors.toList());
+        return postRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(postMapper::toPostDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -212,6 +172,24 @@ public class PostService {
         return posts.stream()
                 .map(postMapper::toPostDTO)
                 .collect(Collectors.toList());
+    }
+
+
+    public PostDTO markPostAsEligible(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+
+        post.setEligibleForAd(true);
+        Post updatedPost = postRepository.save(post);
+
+        rabbitMQPublisher.sendPostMessage(
+                post.getDescription(),
+                post.getUser().getUsername(),
+                post.getCreatedAt().toString()
+        );
+
+        return postMapper.toPostDTO(updatedPost);
     }
 
 }

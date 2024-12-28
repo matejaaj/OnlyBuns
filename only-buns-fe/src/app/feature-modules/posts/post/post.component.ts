@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, NgZone, OnInit} from '@angular/core';
 import { PostService } from '../post.service';
 import { Post } from '../model/post';
 import { Comment } from '../model/comment';
@@ -32,7 +32,9 @@ export class PostComponent implements OnInit {
   userLikes: Like[] = []; // Svi lajkovi za proveru
   constructor(
     private postService: PostService,
-    protected authService: AuthService
+    protected authService: AuthService,
+    private cdr: ChangeDetectorRef, // Dodato
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -73,13 +75,23 @@ export class PostComponent implements OnInit {
     });
   }
 
+  // likePost(postId: number): void {
+  //   const userId = this.getCurrentUserId();
+  //   this.postService.likePost(postId, userId).subscribe(() => {
+  //     const post = this.posts.find((p) => p.id === postId);
+  //     if (post && !post.isLiked) {
+  //       post.isLiked = true;
+  //       post.likeCount += 1;
+  //     }
+  //   });
+  // }
+
   likePost(postId: number): void {
-    const userId = this.getCurrentUserId();
-    this.postService.likePost(postId, userId).subscribe(() => {
+    this.postService.likePost(postId).subscribe((updatedPost) => {
       const post = this.posts.find((p) => p.id === postId);
-      if (post && !post.isLiked) {
-        post.isLiked = true;
-        post.likeCount += 1;
+      if (post) {
+        post.isLiked = true; // Ažuriramo status lajka
+        post.likeCount = updatedPost.likeCount; // Ažuriramo broj lajkova iz odgovora
       }
     });
   }
@@ -177,5 +189,47 @@ export class PostComponent implements OnInit {
 
       this.updateIsLikedStatus(); // Ažuriraj status lajkova
     });
+  }
+
+  onCheckboxToggle(post: Post): void {
+    // Sačuvaj originalno stanje
+    const originalState = post.eligibleForAd;
+
+    // Ažuriraj lokalno stanje odmah
+    post.eligibleForAd = true;
+
+    // Izvrši API poziv
+    this.postService.updateAdEligibility(post.id).subscribe(
+      (updatedPost) => {
+        // Uspešno: Ostavlja lokalnu promenu
+        console.log('Ad eligibility updated:', updatedPost);
+      },
+      (error) => {
+        // Ako API poziv ne uspe, vrati originalno stanje
+        console.error('Failed to update ad eligibility:', error);
+        post.eligibleForAd = originalState;
+        alert('Failed to mark post as eligible for ads. Please try again.');
+      }
+    );
+  }
+
+  toggleAdEligibility(post: Post): void {
+    if (post.eligibleForAd) {
+      return;
+    }
+
+    this.postService.updateAdEligibility(post.id).subscribe(
+      (updatedPost) => {
+        // Ažuriraj lokalni model nakon uspešnog odgovora
+        const postToUpdate = this.posts.find((p) => p.id === post.id);
+        if (postToUpdate) {
+          postToUpdate.eligibleForAd = updatedPost.eligibleForAd;
+        }
+      },
+      (error) => {
+        console.error('Failed to update ad eligibility:', error);
+        alert('Failed to mark post as eligible for ads. Please try again.');
+      }
+    );
   }
 }
