@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { PostService } from '../post.service';
 import { Post } from '../model/post';
 import { Comment } from '../model/comment';
 import { AuthService } from '../../../infrastructure/auth/auth.service';
 import { Like } from '../model/like';
 import { Observable } from 'rxjs';
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 interface ExtendedPostDTO extends Post {
   isLiked: boolean;
@@ -17,9 +19,16 @@ interface ExtendedPostDTO extends Post {
   selector: 'app-post',
   templateUrl: './post.component.html',
   styleUrls: ['./post.component.css'],
+  imports: [
+    NgIf,
+    NgForOf,
+    FormsModule,
+    DatePipe
+  ],
+  standalone: true
 })
 export class PostComponent implements OnInit {
-  posts: ExtendedPostDTO[] = [];
+  @Input() posts: ExtendedPostDTO[] = [];
   userLikes: Like[] = []; // Svi lajkovi za proveru
   constructor(
     private postService: PostService,
@@ -31,6 +40,7 @@ export class PostComponent implements OnInit {
       this.loadPosts();
     } else {
       this.loadLikes();
+      this.loadUserFeed();
     }
   }
 
@@ -59,7 +69,7 @@ export class PostComponent implements OnInit {
   loadLikes(): void {
     this.postService.getLikes().subscribe((likes) => {
       this.userLikes = likes;
-      this.loadPosts(); // Učitaj postove tek nakon što imamo sve lajkove
+      this.loadUserFeed(); // Učitaj postove tek nakon što imamo sve lajkove
     });
   }
 
@@ -81,7 +91,7 @@ export class PostComponent implements OnInit {
       this.postService.addComment(postId, userId, content).subscribe(
         (comment: Comment) => {
           // Nakon uspešnog dodavanja komentara, ponovo učitaj postove
-          this.loadPosts();
+          this.loadUserFeed();
         },
         (error) => {
           if (error.status === 429) {
@@ -142,6 +152,30 @@ export class PostComponent implements OnInit {
       post.isLiked = this.userLikes.some(
         (like) => like.postId === post.id && like.userId === userId
       );
+    });
+  }
+
+  loadUserFeed(): void {
+    const userId = this.getCurrentUserId(); // ID trenutno ulogovanog korisnika
+    this.postService.getUserFeed(userId).subscribe((data) => {
+      this.posts = data.map((post) => ({
+        ...post,
+        isLiked: false,
+        newCommentContent: '',
+        isEditing: false,
+        newDescription: '',
+      }));
+
+      // Keširaj slike
+      this.posts.forEach((post) => {
+        if (post.image && post.image.path) {
+          this.postService.getCachedImage(post.image.path).subscribe((url) => {
+            post.cachedImagePath = url;
+          });
+        }
+      });
+
+      this.updateIsLikedStatus(); // Ažuriraj status lajkova
     });
   }
 }

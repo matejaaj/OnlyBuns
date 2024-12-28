@@ -98,4 +98,9 @@ export class PostService {
         })
       );
   }
+
+  getUserFeed(userId: number): Observable<Post[]> {
+    console.log(`Fetching user feed for userId: ${userId}`);
+    return this.apiService.get(`http://localhost:8080/api/posts/user-feed?userId=${userId}`);
+  }
 }

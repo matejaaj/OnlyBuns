@@ -4,14 +4,11 @@ import com.example.onlybunsbe.DTO.CommentDTO;
 import com.example.onlybunsbe.DTO.ImageDTO;
 import com.example.onlybunsbe.DTO.LocationDTO;
 import com.example.onlybunsbe.DTO.PostDTO;
-import com.example.onlybunsbe.model.Comment;
-import com.example.onlybunsbe.model.Like;
+import com.example.onlybunsbe.model.*;
 import com.example.onlybunsbe.repository.*;
 import com.example.onlybunsbe.dtomappers.PostMapper;
 import com.example.onlybunsbe.model.Comment;
-import com.example.onlybunsbe.model.Image;
 import com.example.onlybunsbe.model.Like;
-import com.example.onlybunsbe.model.Post;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +35,7 @@ public class PostService {
     private LikeRepository likeRepository;
     private CommentRepository commentRepository;
     private LocationRepository locationRepository;
+    private FollowRepository followRepository;
     @Transactional
     public Optional<PostDTO> getPostById(Long id) {
         return postRepository.findById(id).map(postMapper::toPostDTO);
@@ -187,4 +185,33 @@ public class PostService {
         }
         return false;
     }
+
+    public List<Post> getPostsByUser(Long userId) {
+        return postRepository.findByUserId(userId);
+    }
+
+    public List<PostDTO> getUserFeed(Long userId) {
+        // Pronađi sve korisnike koje korisnik prati
+        List<Long> followedUserIds = followRepository.findFollowedIdsByFollowerId(userId);
+        System.out.println("Followed User IDs: " + followedUserIds);
+
+        // Ako je lista prazna, koristimo samo ID trenutnog korisnika
+        if (followedUserIds.isEmpty()) {
+            System.out.println("No followed users found. Returning posts for the current user only.");
+            followedUserIds = List.of(userId); // Napravimo novu listu sa samo trenutnim korisnikom
+        } else {
+            // Dodaj ID trenutno prijavljenog korisnika u listu
+            followedUserIds.add(userId);
+        }
+
+        // Pronađi postove samo za ove korisnike
+        List<Post> posts = postRepository.findByUserIdInOrderByCreatedAtDesc(followedUserIds);
+        System.out.println("Posts Retrieved: " + posts);
+
+        // Mapiraj postove u DTO
+        return posts.stream()
+                .map(postMapper::toPostDTO)
+                .collect(Collectors.toList());
+    }
+
 }

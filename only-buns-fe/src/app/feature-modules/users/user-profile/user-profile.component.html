@@ -30,6 +30,12 @@
     <button (click)="followUser()">Follow</button>
   </div>
 
+  <!-- Post Component -->
+  <div class="user-posts">
+    <h3>{{ isCurrentUserProfile ? 'Your Posts' : user?.username + "'s Posts" }}</h3>
+    <app-post [posts]="posts"></app-post>
+  </div>
+
   <!-- Success/Error Messages -->
   <div *ngIf="followSuccess" class="alert alert-info">{{ followSuccess }}</div>
   <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>

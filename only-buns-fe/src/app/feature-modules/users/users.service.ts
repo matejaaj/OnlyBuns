@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { User } from '../../infrastructure/auth/model/user';
 import { HttpParams } from '@angular/common/http';
 import {Follow} from '../../shared/model/follow';
+import {Post} from '../posts/model/post';
 
 @Injectable({
   providedIn: 'root',
@@ -89,5 +90,31 @@ export class UserService {
   getUserByEmail(email: string): Observable<User> {
     const url = `http://localhost:8080/api/user/searchEmail?email=${encodeURIComponent(email)}`;
     return this.apiService.get(url);
+  }
+
+  getUserPosts(userId: number): Observable<Post[]> {
+    return this.apiService.get(`http://localhost:8080/api/posts/user/${userId}`);
+  }
+
+  getCachedImage(imagePath: string): Observable<string> {
+    const cacheKey = `cached_${imagePath}`;
+    const cachedUrl = localStorage.getItem(cacheKey);
+
+    if (cachedUrl) {
+      return new Observable((observer) => {
+        observer.next(cachedUrl);
+        observer.complete();
+      });
+    } else {
+      const fullUrl = `http://localhost:8080/uploads/${imagePath}`;
+      return new Observable((observer) => {
+        // Simulacija keširanja (može se povezati sa pravim API-jem za obradu slika)
+        setTimeout(() => {
+          localStorage.setItem(cacheKey, fullUrl);
+          observer.next(fullUrl);
+          observer.complete();
+        }, 100); // Simuliraj kratko kašnjenje za "keširanje"
+      });
+    }
   }
 }

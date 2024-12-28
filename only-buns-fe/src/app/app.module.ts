@@ -22,14 +22,13 @@ import {AnalyticsComponent} from './feature-modules/analytics/analytics.componen
 import { UserProfileComponent} from './feature-modules/users/user-profile/user-profile.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    PostComponent,
-    HomeComponent,
-    SignUpComponent,
-    LoginComponent,
-    UserListComponent,
-  ],
+    declarations: [
+        AppComponent,
+        HomeComponent,
+        SignUpComponent,
+        LoginComponent,
+        UserListComponent,
+    ],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -46,14 +45,18 @@ import { UserProfileComponent} from './feature-modules/users/user-profile/user-p
     TrendsComponent,
     AnalyticsComponent,
     UserProfileComponent,
+    PostComponent,
   ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: TokenInterceptor,
-      multi: true,
-    },
-  ],
-  bootstrap: [AppComponent],
+    providers: [
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: TokenInterceptor,
+            multi: true,
+        },
+    ],
+    bootstrap: [AppComponent],
+    exports: [
+        PostComponent
+    ]
 })
 export class AppModule {}
