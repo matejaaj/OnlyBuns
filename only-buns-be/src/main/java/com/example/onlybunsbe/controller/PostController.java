@@ -2,8 +2,10 @@ package com.example.onlybunsbe.controller;
 
 import com.example.onlybunsbe.DTO.CommentDTO;
 import com.example.onlybunsbe.DTO.PostDTO;
+import com.example.onlybunsbe.model.Post;
 import com.example.onlybunsbe.service.ImageService;
 import com.example.onlybunsbe.service.PostService;
+import com.example.onlybunsbe.repository.FollowRepository;
 import com.example.onlybunsbe.util.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.example.onlybunsbe.dtomappers.PostMapper;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -25,6 +28,10 @@ public class PostController {
     private PostService postService;
     @Autowired
     private TokenUtils tokenUtils;
+    @Autowired
+    private PostMapper postMapper;
+    @Autowired
+    private FollowRepository followRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
@@ -87,6 +94,20 @@ public class PostController {
         }
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PostDTO>> getPostsByUser(@PathVariable Long userId) {
+        List<Post> posts = postService.getPostsByUser(userId);
+        List<PostDTO> postDTOs = posts.stream()
+                .map(postMapper::toPostDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(postDTOs);
+    }
+
+    @GetMapping("/user-feed")
+    public ResponseEntity<List<PostDTO>> getUserFeed(@RequestParam Long userId) {
+        List<PostDTO> postDTOs = postService.getUserFeed(userId);
+        return ResponseEntity.ok(postDTOs);
+    }
     @PutMapping("/ad-eligibility/{postId}")
     public ResponseEntity<PostDTO> markPostAsEligibleForAd(@PathVariable Long postId) {
         PostDTO updatedPost = postService.markPostAsEligible(postId);

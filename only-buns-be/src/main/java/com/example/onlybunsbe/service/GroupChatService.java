@@ -151,4 +151,9 @@ public class GroupChatService {
                 .map(joinDate -> Instant.now().isBefore(joinDate.plus(Duration.ofMinutes(5)))) // Adjust logic if needed
                 .orElse(true);
     }
+
+    @Transactional(readOnly = true)
+    public boolean isUserMemberOfGroup(Long groupId, Long userId) {
+        return groupChatMemberRepository.existsByGroupChatIdAndUserId(groupId, userId);
+    }
 }

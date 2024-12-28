@@ -246,6 +246,7 @@ public class UserService {
                 .filter(u -> u.getFollowing().stream()
                         .anyMatch(following -> following.getId().equals(userId)))
                 .count();
+    }
 
     public void updateLastLogin(Long userId) {
         User user = userRepository.findById(userId)

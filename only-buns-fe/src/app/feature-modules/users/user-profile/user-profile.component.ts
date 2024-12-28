@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgForOf, NgIf } from '@angular/common';
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import { UserService } from '../users.service';
 import {AuthService} from '../../../infrastructure/auth/auth.service';
 import {Follow} from '../../../shared/model/follow';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {PostComponent} from '../../posts/post/post.component';
+import {AppModule} from '../../../app.module';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-user-profile',
@@ -12,7 +15,9 @@ import {ActivatedRoute} from '@angular/router';
   imports: [
     FormsModule,
     NgForOf,
-    NgIf
+    NgIf,
+    DatePipe,
+    PostComponent
   ],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
@@ -27,22 +32,35 @@ export class UserProfileComponent implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
   followSuccess: string = '';
+  posts: any[] = [];
+  routeSubscription!: Subscription;
 
   constructor(
     private userService: UserService,
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    const userId = this.route.snapshot.params['id'];
+    // Subscribujemo se na promene u URL parametru `id`
+    this.routeSubscription = this.route.params.subscribe((params) => {
+      const userId = params['id'];
 
-    if (userId) {
-      this.isCurrentUserProfile = false;
-      this.loadUser(userId);
-    } else {
-      this.isCurrentUserProfile = true;
-      this.loadCurrentUser();
+      if (userId) {
+        this.isCurrentUserProfile = false;
+        this.loadUser(userId); // Učitaj podatke za drugog korisnika
+      } else {
+        this.isCurrentUserProfile = true;
+        this.loadCurrentUser(); // Učitaj podatke za trenutno prijavljenog korisnika
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Odjavljujemo se iz `routeSubscription` kako bismo izbegli curenje memorije
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
     }
   }
 
@@ -53,6 +71,7 @@ export class UserProfileComponent implements OnInit {
         this.currentUser = user;
         this.loadFollowers();
         this.loadFollowing();
+        this.loadUserPosts(this.currentUser.id)
       },
       (err) => {
         this.errorMessage = 'Failed to load user data.';
@@ -64,6 +83,7 @@ export class UserProfileComponent implements OnInit {
     this.userService.getUserById(userId).subscribe(
       (user) => {
         this.user = user;
+        this.loadUserPosts(userId); // Učitaj postove korisnika
       },
       (err) => {
         this.errorMessage = 'Failed to load user profile.';
@@ -94,21 +114,20 @@ export class UserProfileComponent implements OnInit {
   }
 
   searchUserByEmail(): void {
-    if (!this.emailToSearch) {
+    if (!this.emailToSearch.trim()) {
       return;
     }
 
     this.userService.getUserByEmail(this.emailToSearch).subscribe(
       (user) => {
-        window.location.href = `/profile/${user.id}`;
+        this.router.navigate(['/profile', user.id]); // Preusmeravanje na profil korisnika
       },
       (err) => {
         this.errorMessage = 'User not found.';
       }
     );
-    this.emailToSearch = '';
+    this.emailToSearch = ''; // Resetovanje polja
   }
-
   followUser(): void {
     if (!this.user) {
       this.errorMessage = 'No user to follow.';
@@ -121,9 +140,7 @@ export class UserProfileComponent implements OnInit {
       },
       (err) => {
         if (err.status === 429) {
-          this.followSuccess = 'You have reached the follow limit. Please wait a minute before trying again.';
         } else {
-          this.errorMessage = 'Failed to follow user.';
         }
       }
     );
@@ -132,11 +149,29 @@ export class UserProfileComponent implements OnInit {
   unfollowUser(userId: number): void {
     this.userService.unfollowUser(userId).subscribe(
       () => {
-        this.successMessage = 'User unfollowed successfully.';
         this.loadFollowing();
       },
       (err) => {
-        this.errorMessage = 'Failed to unfollow user.';
+      }
+    );
+  }
+  loadUserPosts(userId: number): void {
+    this.userService.getUserPosts(userId).subscribe(
+      (posts) => {
+        this.posts = posts.map((post: any) => {
+          // Proveri da li post ima sliku i keširaj je ako postoji
+          if (post.image && post.image.path) {
+            this.userService
+              .getCachedImage(post.image.path)
+              .subscribe((cachedPath: string) => {
+                post.image.url = cachedPath; // Postavi keširani URL slike
+              });
+          }
+          return post;
+        });
+      },
+      (err) => {
+        this.errorMessage = 'Failed to load user posts.';
       }
     );
   }
