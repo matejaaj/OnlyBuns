@@ -1,0 +1,51 @@
+<h1>Registered Users</h1>
+
+<div>
+  <label>Sort by:</label>
+  <button (click)="onSortChange('email')">Email</button>
+  <button (click)="onSortChange('following')">Following Count</button>
+</div>
+
+<div>
+  <label>Search by Name:</label>
+  <input [(ngModel)]="searchName" placeholder="Name">
+
+  <label>Search by Email:</label>
+  <input [(ngModel)]="searchEmail" placeholder="Email">
+
+  <label>Min Posts:</label>
+  <input [(ngModel)]="minPosts" type="number" placeholder="Min">
+
+  <label>Max Posts:</label>
+  <input [(ngModel)]="maxPosts" type="number" placeholder="Max">
+
+  <button (click)="onSearch()">Search</button>
+</div>
+
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Role</th>
+    <th>Posts</th>
+    <th>Following</th>
+    <th>Followers</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let user of filteredUsers">
+    <td>{{ user.firstName }} {{ user.lastName }}</td>
+    <td>{{ user.email }}</td>
+    <td>{{ user.role }}</td>
+    <td>{{ user.postCount }}</td>
+    <td>{{ user.followingCount }}</td>
+    <td>{{ user.followerCount }}</td>
+  </tr>
+  </tbody>
+</table>
+<div *ngIf="totalPages > 1" class="pagination">
+  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+  <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+</div>

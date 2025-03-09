@@ -1,0 +1,82 @@
+<!-- Navbar -->
+<div class="navbar">
+  <button *ngIf="authService.isAuthenticated()" (click)="logout()">
+    Logout
+  </button>
+  <button *ngIf="authService.isAuthenticated()" routerLink="/profile">
+    My Profile
+  </button>
+  <button *ngIf="authService.isAuthenticated() && authService.isAdmin()" routerLink="/posts">
+    All Users' Posts
+  </button>
+  <button *ngIf="authService.isAuthenticated() && authService.isAdmin()" routerLink="/trends">
+    View Trends
+  </button>
+  <button *ngIf="authService.isAuthenticated() && authService.isAdmin()" routerLink="/analytics">
+    Application Analytics
+  </button>
+  <button *ngIf="authService.isAdmin()" routerLink="/users">
+    See Users
+    </button>
+  <button *ngIf="!authService.isAuthenticated()" routerLink="/signup">
+    Sign Up
+  </button>
+  <button *ngIf="!authService.isAuthenticated()" routerLink="/login">
+    Login
+  </button>
+</div>
+
+<!-- Floating Chat Button -->
+<button
+  *ngIf="authService.isAuthenticated()"
+  routerLink="/chat"
+  class="floating-chat-button"
+>
+  Chat
+</button>
+
+<!-- View Mode Labels -->
+<div class="view-switcher">
+  <span
+    [class.active]="viewMode === 'following'"
+    (click)="setViewMode('following')"
+    >Following</span
+  >
+  <span [class.active]="viewMode === 'nearby'" (click)="setViewMode('nearby')"
+    >Nearby</span
+  >
+  <span
+    [class.active]="viewMode === 'trending'"
+    (click)="setViewMode('trending')"
+    >Trending</span
+  >
+</div>
+
+<div class="center-buttons">
+  <button *ngIf="isAdmin" routerLink="/users">See users</button>
+</div>
+
+<div class="center-buttons">
+  <button
+    *ngIf="authService.isAuthenticated() && !isAdmin"
+    routerLink="/create-post"
+  >
+    Create Post
+  </button>
+</div>
+
+<!-- Conditional Display of Posts -->
+<div *ngIf="viewMode === 'following'">
+  <!-- Component or logic to display posts from followed users -->
+  <app-post></app-post>
+</div>
+
+<div *ngIf="viewMode === 'nearby'">
+  <h1 style="text-align: center">Nearby Posts</h1>
+  <!-- Component or logic to display nearby posts -->
+</div>
+
+<div *ngIf="viewMode === 'trending'">
+  <h1 style="text-align: center">Trending Posts</h1>
+  <!-- Component or logic to display trending posts -->
+</div>

@@ -68,7 +68,7 @@ local.properties
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
-
+.idea/
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -150,5 +150,9 @@ fabric.properties
 
 # Local History for Visual Studio Code
 .history/
+
+# Ignore uploaded images in static folder
+src/main/resources/static/uploads/
+
 
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Vuejs,Eclipse,Intellij,VisualStudioCode

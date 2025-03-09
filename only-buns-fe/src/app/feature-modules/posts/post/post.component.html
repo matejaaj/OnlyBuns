@@ -1,0 +1,67 @@
+<div *ngFor="let post of posts">
+  <h2 *ngIf="!post.isEditing">{{ post.description }}</h2>
+  <input
+    *ngIf="post.isEditing"
+    [(ngModel)]="post.newDescription"
+    placeholder="Enter new description"
+  />
+  <div *ngIf="isOwner(post.userId)">
+    <button *ngIf="!post.isEditing" (click)="enableEdit(post)">Edit</button>
+    <button *ngIf="post.isEditing" (click)="saveEdit(post)">Save</button>
+    <button *ngIf="post.isEditing" (click)="cancelEdit(post)">Cancel</button>
+    <button (click)="deletePost(post.id)">Delete</button>
+  </div>
+  <img
+    *ngIf="post.image.path"
+    [src]="
+      post.cachedImagePath || 'http://localhost:8080/uploads/' + post.image.path
+    "
+    alt="Post Image"
+    class="post-image"
+  />
+  <p>Created At: {{ post.createdAt | date : "short" }}</p>
+  <p>Likes: {{ post.likeCount }}</p>
+
+  <button
+    *ngIf="!post.isLiked && authService.isAuthenticated()"
+    (click)="likePost(post.id)"
+  >
+    Like
+  </button>
+  <button *ngIf="post.isLiked" disabled>Liked</button>
+
+  <div *ngIf="post.eligibleForAd">
+    <p class="ad-status">Marked as eligible for ads</p>
+  </div>
+  <div *ngIf="!post.eligibleForAd && authService.isAdmin()">
+    <label>
+      <input
+        type="checkbox"
+        [checked]="post.eligibleForAd"
+        (change)="onCheckboxToggle(post)"
+      />
+      Mark eligible for ad
+    </label>
+  </div>
+
+  <div *ngIf="authService.isAuthenticated()">
+    <input
+      [(ngModel)]="post.newCommentContent"
+      placeholder="Add a comment..."
+    />
+    <button (click)="addComment(post.id, post.newCommentContent)">
+      Comment
+    </button>
+  </div>
+
+  <h3>Comments</h3>
+  <ul>
+    <li *ngFor="let comment of post.comments">
+      <strong>{{ comment.userName }}</strong
+      >: {{ comment.content }} <br />
+      <small>{{ comment.createdAt | date : "short" }}</small>
+    </li>
+  </ul>
+
+  <hr />
+</div>

@@ -1,0 +1,42 @@
+<div class="user-profile">
+  <h1>{{ user?.firstName }} {{ user?.lastName }}</h1>
+  <p>Email: {{ user?.email }}</p>
+
+  <!-- Current User Section -->
+  <div *ngIf="isCurrentUserProfile">
+    <h2>Your Profile</h2>
+    <p>Address: {{ user?.address }}</p>
+
+    <!-- Search User by Email -->
+    <div>
+      <input type="text" [(ngModel)]="emailToSearch" placeholder="Enter email to search" />
+      <button (click)="searchUserByEmail()">Search</button>
+    </div>
+
+    <!-- Your Following List -->
+    <h3>Your Following:</h3>
+    <ul>
+      <li *ngFor="let follow of following">
+        {{ follow.followedUsername }}
+        <button (click)="unfollowUser(follow.followedId)">Unfollow</button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Other User Section -->
+  <div *ngIf="!isCurrentUserProfile">
+    <h2>{{ user?.username }}'s Profile</h2>
+    <p>Address: {{ user?.address }}</p>
+    <button (click)="followUser()">Follow</button>
+  </div>
+
+  <!-- Post Component -->
+  <div class="user-posts">
+    <h3>{{ isCurrentUserProfile ? 'Your Posts' : user?.username + "'s Posts" }}</h3>
+    <app-post [posts]="posts"></app-post>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="followSuccess" class="alert alert-info">{{ followSuccess }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+</div>
